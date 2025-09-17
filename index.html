@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="frame-src 'self' https://www.linkedin.com; frame-ancestors 'self' https://www.linkedin.com;">
+    <title>Tvilling</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #fafafa;
+            --fg: #000;
+            --light-gray: #666;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .hero-title {
+            font-size: clamp(4rem, 15vw, 12rem);
+            font-weight: 100;
+            letter-spacing: -0.02em;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .nav {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            right: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-item {
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            font-weight: 400;
+            color: var(--light-gray);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .nav-item:hover {
+            color: var(--fg);
+        }
+
+        .about-section {
+            max-width: 600px;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            font-weight: 500;
+            color: var(--light-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            font-weight: 300;
+            color: var(--fg);
+        }
+
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 500;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .overlay-content {
+            max-width: 600px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .overlay h2 {
+            font-size: 2rem;
+            font-weight: 100;
+            margin-bottom: 2rem;
+        }
+
+        .overlay p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .close:hover {
+            opacity: 1;
+        }
+
+        .close::before,
+        .close::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 15px;
+            height: 1px;
+            background: var(--fg);
+        }
+
+        .close::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .close::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                top: 1rem;
+                left: 1rem;
+                right: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .about-section {
+                margin-top: 2rem;
+            }
+
+            .about-text {
+                font-size: 1rem;
+            }
+
+            .videos-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 0 1rem;
+            }
+
+            .video-container {
+                padding: 1.5rem;
+            }
+
+            .video-iframe {
+                height: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="three-canvas"></canvas>
+
+    <nav class="nav">
+        <div class="nav-item" onclick="showOverlay('about')">ABOUT</div>
+        <div class="nav-item" onclick="showOverlay('contact')">CONTACT</div>
+    </nav>
+
+    <div class="container">
+        <h1 class="hero-title">TVILLING</h1>
+
+        <div class="about-section">
+            <div class="section-title">ABOUT</div>
+            <p class="about-text">
+                Tvilling creates seamless digital twins through real-time camera integration and Three.js visualization. Bridging physical and digital realities with IoT technology.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="overlay" id="about">
+        <div class="close" onclick="closeOverlay('about')"></div>
+        <div class="overlay-content">
+            <h2>About</h2>
+            <p>
+                Tvilling creates seamless digital twins through real-time camera integration and Three.js visualization. Bridging physical and digital realities with IoT technology.
+            </p>
+        </div>
+    </div>
+
+    <div class="overlay" id="contact">
+        <div class="close" onclick="closeOverlay('contact')"></div>
+        <div class="overlay-content">
+            <h2>Contact</h2>
+            <p>
+                Ready to bridge realities? Connect with our team of digital twin specialists.
+                Let's create the future of synchronized physical-digital experiences together.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function showOverlay(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeOverlay(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active'));
+            }
+        });
+
+        // Three.js Scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+
+        // Create video planes
+        const videoPlanes = [];
+        const colors = [
+            { color1: 0x667eea, color2: 0x764ba2 },
+            { color1: 0xf093fb, color2: 0xf5576c },
+            { color1: 0x4facfe, color2: 0x00f2fe },
+            { color1: 0x43e97b, color2: 0x38f9d7 },
+            { color1: 0xfa709a, color2: 0xfee140 }
+        ];
+
+        colors.forEach((colorPair, index) => {
+            // Create canvas for gradient
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 384;
+            const ctx = canvas.getContext('2d');
+
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, `#${colorPair.color1.toString(16).padStart(6, '0')}`);
+            gradient.addColorStop(1, `#${colorPair.color2.toString(16).padStart(6, '0')}`);
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Add text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 48px Inter, Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('TVILLING', canvas.width/2, canvas.height/2 - 20);
+
+            ctx.font = '24px Inter, Arial';
+            ctx.fillText(`Demo Video ${index + 1}`, canvas.width/2, canvas.height/2 + 30);
+
+            // Create texture and material
+            const texture = new THREE.CanvasTexture(canvas);
+            const geometry = new THREE.PlaneGeometry(4, 3);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+
+            const plane = new THREE.Mesh(geometry, material);
+
+            // Position in orbital pattern
+            const angle = (index / colors.length) * Math.PI * 2;
+            const radius = 15;
+            plane.position.x = Math.cos(angle) * radius;
+            plane.position.z = Math.sin(angle) * radius;
+            plane.position.y = (Math.random() - 0.5) * 8;
+
+            // Store orbital properties
+            plane.userData = {
+                angle: angle,
+                radius: radius,
+                speed: 0.01 + Math.random() * 0.01,
+                yOffset: plane.position.y,
+                rotationSpeed: (Math.random() - 0.5) * 0.02
+            };
+
+            scene.add(plane);
+            videoPlanes.push(plane);
+        });
+
+        camera.position.z = 25;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            videoPlanes.forEach((plane) => {
+                // Update orbital position
+                plane.userData.angle += plane.userData.speed;
+                plane.position.x = Math.cos(plane.userData.angle) * plane.userData.radius;
+                plane.position.z = Math.sin(plane.userData.angle) * plane.userData.radius;
+                plane.position.y = plane.userData.yOffset + Math.sin(plane.userData.angle * 2) * 2;
+
+                // Add rotation
+                plane.rotation.y += plane.userData.rotationSpeed;
+                plane.rotation.x = Math.sin(plane.userData.angle) * 0.3;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
