@@ -282,25 +282,16 @@
             { color1: 0xfa709a, color2: 0xfee140 }
         ];
 
-        const videoUrls = [
-            'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7317274213457788928?compact=1',
-            'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7327045924390637569?compact=1',
-            'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7340474950006247425?compact=1',
-            'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7372138036412891136?compact=1',
-            'https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7373680075940130816?compact=1'
+        const linkedinPosts = [
+            'https://www.linkedin.com/posts/activity-7317274213457788928',
+            'https://www.linkedin.com/posts/activity-7327045924390637569',
+            'https://www.linkedin.com/posts/activity-7340474950006247425',
+            'https://www.linkedin.com/posts/activity-7372138036412891136',
+            'https://www.linkedin.com/posts/activity-7373680075940130816'
         ];
 
         colors.forEach((colorPair, index) => {
-            // Create iframe element
-            const iframe = document.createElement('iframe');
-            iframe.src = videoUrls[index];
-            iframe.width = 320;
-            iframe.height = 240;
-            iframe.frameBorder = 0;
-            iframe.allowFullscreen = true;
-            iframe.style.borderRadius = '12px';
-
-            // Create canvas from iframe (fallback to gradient if iframe fails)
+            // Create canvas with play button
             const canvas = document.createElement('canvas');
             canvas.width = 320;
             canvas.height = 240;
@@ -314,14 +305,29 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Add text
+            // Add text and play button
             ctx.fillStyle = 'white';
             ctx.font = 'bold 24px Inter, Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('TVILLING', canvas.width/2, canvas.height/2 - 10);
+            ctx.fillText('TVILLING', canvas.width/2, canvas.height/2 - 30);
 
             ctx.font = '16px Inter, Arial';
-            ctx.fillText(`Demo Video ${index + 1}`, canvas.width/2, canvas.height/2 + 15);
+            ctx.fillText(`Demo Video ${index + 1}`, canvas.width/2, canvas.height/2 - 5);
+
+            // Draw play button
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2 + 30, 25, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fill();
+
+            // Play triangle
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2 - 8, canvas.height/2 + 20);
+            ctx.lineTo(canvas.width/2 + 12, canvas.height/2 + 30);
+            ctx.lineTo(canvas.width/2 - 8, canvas.height/2 + 40);
+            ctx.closePath();
+            ctx.fillStyle = colorPair.color1.toString(16).padStart(6, '0').includes('66') ? '#667eea' : `#${colorPair.color1.toString(16).padStart(6, '0')}`;
+            ctx.fill();
 
             // Create texture and material
             const texture = new THREE.CanvasTexture(canvas);
@@ -342,18 +348,39 @@
             plane.position.z = Math.sin(angle) * radius;
             plane.position.y = (Math.random() - 0.5) * 8;
 
-            // Store orbital properties
+            // Store orbital properties and LinkedIn URL
             plane.userData = {
                 angle: angle,
                 radius: radius,
                 speed: 0.01 + Math.random() * 0.01,
                 yOffset: plane.position.y,
-                rotationSpeed: (Math.random() - 0.5) * 0.02
+                rotationSpeed: (Math.random() - 0.5) * 0.02,
+                linkedinUrl: linkedinPosts[index]
             };
 
             scene.add(plane);
             videoPlanes.push(plane);
         });
+
+        // Add click detection
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function onMouseClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(videoPlanes);
+
+            if (intersects.length > 0) {
+                const clickedPlane = intersects[0].object;
+                window.open(clickedPlane.userData.linkedinUrl, '_blank');
+            }
+        }
+
+        document.getElementById('three-canvas').addEventListener('click', onMouseClick);
+        document.getElementById('three-canvas').style.cursor = 'pointer';
 
         camera.position.z = 25;
 
