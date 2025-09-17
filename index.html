@@ -18,7 +18,15 @@
             --bg: #fafafa;
             --fg: #000;
             --light-gray: #666;
+            --gradient-1: #667eea;
+            --gradient-2: #764ba2;
         }
+
+        .video-item:nth-child(1) .video-thumbnail { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .video-item:nth-child(2) .video-thumbnail { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .video-item:nth-child(3) .video-thumbnail { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .video-item:nth-child(4) .video-thumbnail { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .video-item:nth-child(5) .video-thumbnail { background: linear-gradient(135deg, #fa709a, #fee140); }
 
         body {
             font-family: 'Inter', -apple-system, sans-serif;
@@ -28,14 +36,92 @@
             position: relative;
         }
 
-        #three-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .video-scroll-section {
+            margin-top: 4rem;
+            padding: 4rem 2rem;
+        }
+
+        .video-item {
+            margin-bottom: 6rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .video-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .video-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #ffffff, #f8f8f8);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .video-thumbnail {
             width: 100%;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
+            height: 300px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail:hover {
+            transform: scale(1.02);
+        }
+
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .video-thumbnail:hover .play-button {
+            transform: scale(1.1);
+            background: rgba(255,255,255,1);
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 20px solid #333;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 4px;
+        }
+
+        .video-info {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .video-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--fg);
+            margin-bottom: 0.5rem;
+        }
+
+        .video-description {
+            font-size: 0.9rem;
+            color: var(--light-gray);
+            line-height: 1.6;
         }
 
         .container {
@@ -210,7 +296,6 @@
     </style>
 </head>
 <body>
-    <canvas id="three-canvas"></canvas>
 
     <nav class="nav">
         <div class="nav-item" onclick="showOverlay('about')">ABOUT</div>
@@ -225,6 +310,78 @@
             <p class="about-text">
                 Tvilling creates seamless digital twins through real-time camera integration and Three.js visualization. Bridging physical and digital realities with IoT technology.
             </p>
+        </div>
+
+        <div class="video-scroll-section">
+            <div class="video-item">
+                <div class="video-container">
+                    <div class="video-thumbnail" onclick="window.open('https://www.linkedin.com/posts/activity-7317274213457788928', '_blank')">
+                        <div class="play-button">
+                            <div class="play-icon"></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Digital Twin Showcase</div>
+                        <div class="video-description">Real-time camera integration with Three.js visualization</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-item">
+                <div class="video-container">
+                    <div class="video-thumbnail" onclick="window.open('https://www.linkedin.com/posts/activity-7327045924390637569', '_blank')">
+                        <div class="play-button">
+                            <div class="play-icon"></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">IoT Integration Demo</div>
+                        <div class="video-description">Bridging physical and digital realities</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-item">
+                <div class="video-container">
+                    <div class="video-thumbnail" onclick="window.open('https://www.linkedin.com/posts/activity-7340474950006247425', '_blank')">
+                        <div class="play-button">
+                            <div class="play-icon"></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Advanced Visualization</div>
+                        <div class="video-description">Seamless digital twin technology in action</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-item">
+                <div class="video-container">
+                    <div class="video-thumbnail" onclick="window.open('https://www.linkedin.com/posts/activity-7372138036412891136', '_blank')">
+                        <div class="play-button">
+                            <div class="play-icon"></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Real-time Synchronization</div>
+                        <div class="video-description">Physical-digital experience demonstration</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-item">
+                <div class="video-container">
+                    <div class="video-thumbnail" onclick="window.open('https://www.linkedin.com/posts/activity-7373680075940130816', '_blank')">
+                        <div class="play-button">
+                            <div class="play-icon"></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Technology Integration</div>
+                        <div class="video-description">Complete digital twin ecosystem showcase</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -265,152 +422,36 @@
             }
         });
 
-        // Three.js Scene
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000, 0);
+        // Scroll animation for video items
+        function checkVideoVisibility() {
+            const videoItems = document.querySelectorAll('.video-item');
+            const windowHeight = window.innerHeight;
+            const scrollTop = window.pageYOffset;
 
-        // Create video planes
-        const videoPlanes = [];
-        const colors = [
-            { color1: 0x667eea, color2: 0x764ba2 },
-            { color1: 0xf093fb, color2: 0xf5576c },
-            { color1: 0x4facfe, color2: 0x00f2fe },
-            { color1: 0x43e97b, color2: 0x38f9d7 },
-            { color1: 0xfa709a, color2: 0xfee140 }
-        ];
+            videoItems.forEach((item, index) => {
+                const itemTop = item.offsetTop;
+                const itemHeight = item.offsetHeight;
 
-        const linkedinPosts = [
-            'https://www.linkedin.com/posts/activity-7317274213457788928',
-            'https://www.linkedin.com/posts/activity-7327045924390637569',
-            'https://www.linkedin.com/posts/activity-7340474950006247425',
-            'https://www.linkedin.com/posts/activity-7372138036412891136',
-            'https://www.linkedin.com/posts/activity-7373680075940130816'
-        ];
+                // Check if item is in viewport
+                if (scrollTop + windowHeight > itemTop + 100 &&
+                    scrollTop < itemTop + itemHeight) {
 
-        colors.forEach((colorPair, index) => {
-            // Create canvas with play button
-            const canvas = document.createElement('canvas');
-            canvas.width = 320;
-            canvas.height = 240;
-            const ctx = canvas.getContext('2d');
-
-            // Gradient fallback
-            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, `#${colorPair.color1.toString(16).padStart(6, '0')}`);
-            gradient.addColorStop(1, `#${colorPair.color2.toString(16).padStart(6, '0')}`);
-
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Add text and play button
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 24px Inter, Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('TVILLING', canvas.width/2, canvas.height/2 - 30);
-
-            ctx.font = '16px Inter, Arial';
-            ctx.fillText(`Demo Video ${index + 1}`, canvas.width/2, canvas.height/2 - 5);
-
-            // Draw play button
-            ctx.beginPath();
-            ctx.arc(canvas.width/2, canvas.height/2 + 30, 25, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.fill();
-
-            // Play triangle
-            ctx.beginPath();
-            ctx.moveTo(canvas.width/2 - 8, canvas.height/2 + 20);
-            ctx.lineTo(canvas.width/2 + 12, canvas.height/2 + 30);
-            ctx.lineTo(canvas.width/2 - 8, canvas.height/2 + 40);
-            ctx.closePath();
-            ctx.fillStyle = colorPair.color1.toString(16).padStart(6, '0').includes('66') ? '#667eea' : `#${colorPair.color1.toString(16).padStart(6, '0')}`;
-            ctx.fill();
-
-            // Create texture and material
-            const texture = new THREE.CanvasTexture(canvas);
-            const geometry = new THREE.PlaneGeometry(4, 3);
-            const material = new THREE.MeshBasicMaterial({
-                map: texture,
-                transparent: true,
-                opacity: 0.3,
-                side: THREE.DoubleSide
+                    // Add delay based on index for staggered animation
+                    setTimeout(() => {
+                        item.classList.add('visible');
+                    }, index * 200);
+                }
             });
-
-            const plane = new THREE.Mesh(geometry, material);
-
-            // Position in orbital pattern
-            const angle = (index / colors.length) * Math.PI * 2;
-            const radius = 15;
-            plane.position.x = Math.cos(angle) * radius;
-            plane.position.z = Math.sin(angle) * radius;
-            plane.position.y = (Math.random() - 0.5) * 8;
-
-            // Store orbital properties and LinkedIn URL
-            plane.userData = {
-                angle: angle,
-                radius: radius,
-                speed: 0.01 + Math.random() * 0.01,
-                yOffset: plane.position.y,
-                rotationSpeed: (Math.random() - 0.5) * 0.02,
-                linkedinUrl: linkedinPosts[index]
-            };
-
-            scene.add(plane);
-            videoPlanes.push(plane);
-        });
-
-        // Add click detection
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
-        function onMouseClick(event) {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(videoPlanes);
-
-            if (intersects.length > 0) {
-                const clickedPlane = intersects[0].object;
-                window.open(clickedPlane.userData.linkedinUrl, '_blank');
-            }
         }
 
-        document.getElementById('three-canvas').addEventListener('click', onMouseClick);
-        document.getElementById('three-canvas').style.cursor = 'pointer';
+        // Initial check
+        checkVideoVisibility();
 
-        camera.position.z = 25;
+        // Check on scroll
+        window.addEventListener('scroll', checkVideoVisibility);
 
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-
-            videoPlanes.forEach((plane) => {
-                // Update orbital position
-                plane.userData.angle += plane.userData.speed;
-                plane.position.x = Math.cos(plane.userData.angle) * plane.userData.radius;
-                plane.position.z = Math.sin(plane.userData.angle) * plane.userData.radius;
-                plane.position.y = plane.userData.yOffset + Math.sin(plane.userData.angle * 2) * 2;
-
-                // Add rotation
-                plane.rotation.y += plane.userData.rotationSpeed;
-                plane.rotation.x = Math.sin(plane.userData.angle) * 0.3;
-            });
-
-            renderer.render(scene, camera);
-        }
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        animate();
+        // Smooth scrolling for better UX
+        document.documentElement.style.scrollBehavior = 'smooth';
     </script>
 </body>
 </html>
