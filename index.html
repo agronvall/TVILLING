@@ -455,6 +455,59 @@
             color: #fff;
         }
 
+        .contact-info {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .contact-info:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 255, 255, 0.3);
+        }
+
+        .contact-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .contact-email {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #00ffff;
+            cursor: pointer;
+            user-select: all;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .contact-email:hover {
+            color: #fff;
+        }
+
+        .copy-indicator {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .contact-email:hover .copy-indicator {
+            opacity: 1;
+        }
+
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -464,6 +517,22 @@
 
             .left-content {
                 max-width: 90%;
+            }
+
+            .contact-info {
+                margin-top: 2rem;
+                padding: 1rem;
+            }
+
+            .contact-email {
+                font-size: 1rem;
+            }
+
+            .copy-indicator {
+                display: block;
+                margin-left: 0;
+                margin-top: 0.5rem;
+                opacity: 1;
             }
 
             .video-player {
@@ -501,6 +570,14 @@
                 Deploy enterprise-grade digital twins in minutes, not months.<br>
                 10x lighter. 100% GDPR compliant. Zero complexity.
             </p>
+
+            <div class="contact-info">
+                <div class="contact-label">CONTACT</div>
+                <div class="contact-email" onclick="copyEmailDirect()">
+                    anton.mikael.gronvall@outlook.com
+                    <span class="copy-indicator">CLICK TO COPY</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -711,6 +788,18 @@
                 success.classList.add('show');
                 setTimeout(() => {
                     success.classList.remove('show');
+                }, 2000);
+            });
+        }
+
+        function copyEmailDirect() {
+            const email = 'anton.mikael.gronvall@outlook.com';
+            navigator.clipboard.writeText(email).then(() => {
+                const emailElement = document.querySelector('.contact-email');
+                const originalHTML = emailElement.innerHTML;
+                emailElement.innerHTML = 'anton.mikael.gronvall@outlook.com <span class="copy-indicator" style="opacity: 1; color: #00ff00;">COPIED!</span>';
+                setTimeout(() => {
+                    emailElement.innerHTML = originalHTML;
                 }, 2000);
             });
         }
