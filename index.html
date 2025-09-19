@@ -84,23 +84,28 @@
             right: 3rem;
             top: 50%;
             transform: translateY(-50%);
-            display: flex;
+            display: flex !important;
             flex-direction: column;
             gap: 2rem;
             z-index: 100;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .video-thumb {
             width: 100px;
             height: 60px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.5);
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(10px);
             transform-origin: center;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         .video-thumb::before {
@@ -127,16 +132,18 @@
         }
 
         .video-thumb.active {
-            width: 560px;
-            height: 350px;
-            position: fixed;
-            top: 50%;
-            left: 50%;
+            width: 560px !important;
+            height: 350px !important;
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
             transform: translate(-50%, -50%) !important;
-            z-index: 1000;
-            background: #000;
-            border: 2px solid #00ffff;
-            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.4);
+            z-index: 1000 !important;
+            background: #000 !important;
+            border: 2px solid #00ffff !important;
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.4) !important;
+            right: auto !important;
+            bottom: auto !important;
         }
 
         .video-thumb iframe {
@@ -144,10 +151,12 @@
             height: 100%;
             border: none;
             display: none;
+            pointer-events: none;
         }
 
         .video-thumb.active iframe {
             display: block;
+            pointer-events: auto;
         }
 
         .video-label {
@@ -263,6 +272,78 @@
             display: block;
         }
 
+        .contact-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 3rem;
+            border-radius: 0;
+            backdrop-filter: blur(20px);
+            z-index: 1001;
+            display: none;
+            text-align: center;
+            min-width: 400px;
+        }
+
+        .contact-modal.active {
+            display: block;
+        }
+
+        .contact-modal h2 {
+            font-size: 2rem;
+            font-weight: 200;
+            margin-bottom: 2rem;
+            letter-spacing: -1px;
+        }
+
+        .email-container {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            margin: 2rem 0;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .email-container:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00ffff;
+        }
+
+        .email-address {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #00ffff;
+            user-select: all;
+            margin-bottom: 0.5rem;
+        }
+
+        .copy-hint {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .copy-success {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            color: #00ff00;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .copy-success.show {
+            opacity: 1;
+        }
+
         .nav {
             position: fixed;
             top: 2rem;
@@ -324,7 +405,7 @@
 </head>
 <body>
     <div class="nav">
-        <a href="mailto:anton.mikael.gronvall@outlook.com" class="nav-item">Contact</a>
+        <a href="#" class="nav-item" onclick="openContactModal()">Contact</a>
     </div>
 
     <div class="container">
@@ -341,6 +422,18 @@
     <div id="canvas-container"></div>
 
     <div class="overlay" id="overlay"></div>
+
+    <div class="contact-modal" id="contactModal">
+        <div class="close-btn" onclick="closeContactModal()"></div>
+        <h2>Contact</h2>
+        <p style="margin-bottom: 2rem; color: rgba(255,255,255,0.7);">Ready to deploy your digital twin?</p>
+        <div class="email-container" onclick="copyEmail()">
+            <div class="email-address">anton.mikael.gronvall@outlook.com</div>
+            <div class="copy-hint">Click to copy</div>
+            <div class="copy-success" id="copySuccess">Copied!</div>
+        </div>
+        <p style="font-size: 0.9rem; color: rgba(255,255,255,0.5);">Response within 24 hours</p>
+    </div>
 
     <div class="video-strip">
         <div class="video-thumb" data-video="7317274213457788928">
@@ -541,6 +634,17 @@
             thumb.classList.add('active');
             overlay.classList.add('active');
 
+            // Force center positioning with inline styles to override everything
+            thumb.style.position = 'fixed';
+            thumb.style.top = '50%';
+            thumb.style.left = '50%';
+            thumb.style.transform = 'translate(-50%, -50%)';
+            thumb.style.width = '560px';
+            thumb.style.height = '350px';
+            thumb.style.zIndex = '1000';
+            thumb.style.right = 'auto';
+            thumb.style.bottom = 'auto';
+
             // Load iframe src
             const iframe = thumb.querySelector('iframe');
             if (!iframe.src) {
@@ -551,9 +655,52 @@
         function closeVideo(thumb) {
             thumb.classList.remove('active');
             overlay.classList.remove('active');
+
+            // Reset inline styles to return to original position
+            thumb.style.position = '';
+            thumb.style.top = '';
+            thumb.style.left = '';
+            thumb.style.transform = '';
+            thumb.style.width = '';
+            thumb.style.height = '';
+            thumb.style.zIndex = '';
+            thumb.style.right = '';
+            thumb.style.bottom = '';
         }
 
         overlay.addEventListener('click', () => {
+            videoThumbs.forEach(thumb => {
+                if (thumb.classList.contains('active')) {
+                    closeVideo(thumb);
+                }
+            });
+        });
+
+        // Contact modal functions
+        function openContactModal() {
+            document.getElementById('contactModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function copyEmail() {
+            const email = 'anton.mikael.gronvall@outlook.com';
+            navigator.clipboard.writeText(email).then(() => {
+                const success = document.getElementById('copySuccess');
+                success.classList.add('show');
+                setTimeout(() => {
+                    success.classList.remove('show');
+                }, 2000);
+            });
+        }
+
+        // Close modal on overlay click
+        document.getElementById('overlay').addEventListener('click', () => {
+            closeContactModal();
             videoThumbs.forEach(thumb => {
                 if (thumb.classList.contains('active')) {
                     closeVideo(thumb);
