@@ -131,7 +131,7 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        .video-thumb.active {
+        .video-strip .video-thumb.active {
             width: 560px !important;
             height: 350px !important;
             position: fixed !important;
@@ -144,6 +144,7 @@
             box-shadow: 0 20px 60px rgba(0, 255, 255, 0.4) !important;
             right: auto !important;
             bottom: auto !important;
+            transition: all 0.3s ease !important;
         }
 
         .video-thumb iframe {
@@ -643,40 +644,41 @@
                 }
             });
 
+            // First add the active class
             thumb.classList.add('active');
             overlay.classList.add('active');
 
-            // Force center positioning with inline styles to override everything
-            thumb.style.position = 'fixed';
-            thumb.style.top = '50%';
-            thumb.style.left = '50%';
-            thumb.style.transform = 'translate(-50%, -50%)';
-            thumb.style.width = '560px';
-            thumb.style.height = '350px';
-            thumb.style.zIndex = '1000';
-            thumb.style.right = 'auto';
-            thumb.style.bottom = 'auto';
+            // Force immediate positioning with requestAnimationFrame for proper timing
+            requestAnimationFrame(() => {
+                // Clear any existing positioning
+                thumb.style.cssText = '';
 
-            // Ensure iframe is visible and ready
-            const iframe = thumb.querySelector('iframe');
-            iframe.style.display = 'block';
-            iframe.style.pointerEvents = 'auto';
+                // Apply centering styles with maximum specificity
+                thumb.style.setProperty('position', 'fixed', 'important');
+                thumb.style.setProperty('top', '50%', 'important');
+                thumb.style.setProperty('left', '50%', 'important');
+                thumb.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
+                thumb.style.setProperty('width', '560px', 'important');
+                thumb.style.setProperty('height', '350px', 'important');
+                thumb.style.setProperty('z-index', '1000', 'important');
+                thumb.style.setProperty('right', 'auto', 'important');
+                thumb.style.setProperty('bottom', 'auto', 'important');
+                thumb.style.setProperty('background', '#000', 'important');
+                thumb.style.setProperty('border', '2px solid #00ffff', 'important');
+
+                // Ensure iframe is visible and ready
+                const iframe = thumb.querySelector('iframe');
+                iframe.style.display = 'block';
+                iframe.style.pointerEvents = 'auto';
+            });
         }
 
         function closeVideo(thumb) {
             thumb.classList.remove('active');
             overlay.classList.remove('active');
 
-            // Reset inline styles to return to original position
-            thumb.style.position = '';
-            thumb.style.top = '';
-            thumb.style.left = '';
-            thumb.style.transform = '';
-            thumb.style.width = '';
-            thumb.style.height = '';
-            thumb.style.zIndex = '';
-            thumb.style.right = '';
-            thumb.style.bottom = '';
+            // Completely reset all inline styles
+            thumb.style.cssText = '';
         }
 
         overlay.addEventListener('click', () => {
