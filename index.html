@@ -109,16 +109,42 @@
             letter-spacing: 0.5px;
         }
 
-        .video-player-main {
+        .video-list {
             flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .video-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .video-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .video-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .video-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 255, 0.5);
+        }
+
+        .video-item {
             padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .video-item:last-child {
+            border-bottom: none;
         }
 
         .video-frame {
             width: 100%;
-            height: 240px;
+            height: 200px;
             border: none;
             border-radius: 8px;
             background: #111;
@@ -126,7 +152,7 @@
         }
 
         .video-info {
-            margin-bottom: 1.5rem;
+            margin-bottom: 0;
         }
 
         .video-title {
@@ -140,56 +166,6 @@
             font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.6);
             line-height: 1.4;
-        }
-
-        .video-controls {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: auto;
-        }
-
-        .video-nav-btn {
-            flex: 1;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            color: #fff;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .video-nav-btn:hover {
-            background: rgba(0, 255, 255, 0.1);
-            border-color: rgba(0, 255, 255, 0.3);
-        }
-
-        .video-nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .video-indicators {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            margin: 1rem 0;
-        }
-
-        .video-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .video-indicator.active {
-            background: #00ffff;
-            transform: scale(1.2);
         }
 
         .video-thumb {
@@ -495,22 +471,12 @@
                 width: auto;
             }
 
-            .video-player-main {
+            .video-item {
                 padding: 1rem;
             }
 
             .video-frame {
-                height: 200px;
-            }
-
-            .video-controls {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .video-nav-btn {
-                padding: 0.5rem;
-                font-size: 0.75rem;
+                height: 180px;
             }
 
             .nav {
@@ -556,29 +522,65 @@
             <div class="video-player-title">DEMO VIDEOS</div>
         </div>
 
-        <div class="video-player-main">
-            <iframe id="videoFrame" class="video-frame"
-                    src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7317274213457788928?compact=1"
-                    frameborder="0"
-                    allowfullscreen>
-            </iframe>
-
-            <div class="video-info">
-                <div class="video-title" id="videoTitle">Real-time 3D Digital Twin</div>
-                <div class="video-description" id="videoDescription">Experience our 3D digital twin technology with real-time camera integration and Three.js visualization.</div>
+        <div class="video-list">
+            <div class="video-item">
+                <iframe class="video-frame"
+                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7317274213457788928?compact=1"
+                        frameborder="0"
+                        allowfullscreen>
+                </iframe>
+                <div class="video-info">
+                    <div class="video-title">Real-time 3D Digital Twin</div>
+                    <div class="video-description">Experience our 3D digital twin technology with real-time camera integration and Three.js visualization.</div>
+                </div>
             </div>
 
-            <div class="video-indicators" id="videoIndicators">
-                <div class="video-indicator active" data-index="0"></div>
-                <div class="video-indicator" data-index="1"></div>
-                <div class="video-indicator" data-index="2"></div>
-                <div class="video-indicator" data-index="3"></div>
-                <div class="video-indicator" data-index="4"></div>
+            <div class="video-item">
+                <iframe class="video-frame"
+                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7327045924390637569?compact=1"
+                        frameborder="0"
+                        allowfullscreen>
+                </iframe>
+                <div class="video-info">
+                    <div class="video-title">IoT Data Integration</div>
+                    <div class="video-description">Seamless integration of IoT sensors and real-time data streams into digital twin environments.</div>
+                </div>
             </div>
 
-            <div class="video-controls">
-                <button class="video-nav-btn" id="prevBtn" onclick="previousVideo()">← Previous</button>
-                <button class="video-nav-btn" id="nextBtn" onclick="nextVideo()">Next →</button>
+            <div class="video-item">
+                <iframe class="video-frame"
+                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7340474950006247425?compact=1"
+                        frameborder="0"
+                        allowfullscreen>
+                </iframe>
+                <div class="video-info">
+                    <div class="video-title">Analytics Dashboard</div>
+                    <div class="video-description">Advanced analytics and monitoring capabilities for comprehensive digital twin insights.</div>
+                </div>
+            </div>
+
+            <div class="video-item">
+                <iframe class="video-frame"
+                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7372138036412891136?compact=1"
+                        frameborder="0"
+                        allowfullscreen>
+                </iframe>
+                <div class="video-info">
+                    <div class="video-title">Enterprise Demo</div>
+                    <div class="video-description">Enterprise-grade digital twin deployment showcasing scalability and performance.</div>
+                </div>
+            </div>
+
+            <div class="video-item">
+                <iframe class="video-frame"
+                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7373680075940130816?compact=1"
+                        frameborder="0"
+                        allowfullscreen>
+                </iframe>
+                <div class="video-info">
+                    <div class="video-title">Advanced Features</div>
+                    <div class="video-description">Cutting-edge features including AI integration and predictive analytics capabilities.</div>
+                </div>
             </div>
         </div>
     </div>
@@ -734,85 +736,7 @@
             }
         });
 
-        // Video Player functionality
-        const videos = [
-            {
-                url: "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7317274213457788928?compact=1",
-                title: "Real-time 3D Digital Twin",
-                description: "Experience our 3D digital twin technology with real-time camera integration and Three.js visualization."
-            },
-            {
-                url: "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7327045924390637569?compact=1",
-                title: "IoT Data Integration",
-                description: "Seamless integration of IoT sensors and real-time data streams into digital twin environments."
-            },
-            {
-                url: "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7340474950006247425?compact=1",
-                title: "Analytics Dashboard",
-                description: "Advanced analytics and monitoring capabilities for comprehensive digital twin insights."
-            },
-            {
-                url: "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7372138036412891136?compact=1",
-                title: "Enterprise Demo",
-                description: "Enterprise-grade digital twin deployment showcasing scalability and performance."
-            },
-            {
-                url: "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7373680075940130816?compact=1",
-                title: "Advanced Features",
-                description: "Cutting-edge features including AI integration and predictive analytics capabilities."
-            }
-        ];
-
-        let currentVideoIndex = 0;
-
-        function updateVideo(index) {
-            const videoFrame = document.getElementById('videoFrame');
-            const videoTitle = document.getElementById('videoTitle');
-            const videoDescription = document.getElementById('videoDescription');
-            const indicators = document.querySelectorAll('.video-indicator');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-
-            // Update video source
-            videoFrame.src = videos[index].url;
-
-            // Update text content
-            videoTitle.textContent = videos[index].title;
-            videoDescription.textContent = videos[index].description;
-
-            // Update indicators
-            indicators.forEach((indicator, i) => {
-                indicator.classList.toggle('active', i === index);
-            });
-
-            // Update button states
-            prevBtn.disabled = (index === 0);
-            nextBtn.disabled = (index === videos.length - 1);
-
-            currentVideoIndex = index;
-        }
-
-        function nextVideo() {
-            if (currentVideoIndex < videos.length - 1) {
-                updateVideo(currentVideoIndex + 1);
-            }
-        }
-
-        function previousVideo() {
-            if (currentVideoIndex > 0) {
-                updateVideo(currentVideoIndex - 1);
-            }
-        }
-
-        // Add click handlers for indicators
-        document.querySelectorAll('.video-indicator').forEach((indicator, index) => {
-            indicator.addEventListener('click', () => {
-                updateVideo(index);
-            });
-        });
-
-        // Initialize video player
-        updateVideo(0);
+        // Videos are now statically loaded and scrollable - no JavaScript needed!
 
         // Contact modal functions
         function openContactModal() {
