@@ -508,6 +508,46 @@
             opacity: 1;
         }
 
+        .use-cases {
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .use-cases-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+
+        .use-case-item {
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .use-case-item:hover {
+            background: rgba(0, 255, 255, 0.05);
+            border-color: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -519,8 +559,23 @@
                 max-width: 90%;
             }
 
-            .contact-info {
+            .use-cases {
                 margin-top: 2rem;
+                margin-bottom: 1rem;
+            }
+
+            .use-cases-grid {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+
+            .use-case-item {
+                padding: 0.7rem;
+                font-size: 0.8rem;
+            }
+
+            .contact-info {
+                margin-top: 1.5rem;
                 padding: 1rem;
             }
 
@@ -570,6 +625,20 @@
                 Deploy enterprise-grade digital twins in minutes, not months.<br>
                 10x lighter. 100% GDPR compliant. Zero complexity.
             </p>
+
+            <div class="use-cases">
+                <div class="use-cases-label">USE CASES</div>
+                <div class="use-cases-grid">
+                    <div class="use-case-item">Facility Management</div>
+                    <div class="use-case-item">Smart Parking</div>
+                    <div class="use-case-item">Alarm Systems</div>
+                    <div class="use-case-item">Data Analytics</div>
+                    <div class="use-case-item">GDPR Compliance</div>
+                    <div class="use-case-item">Documentation</div>
+                    <div class="use-case-item">CAD Integration</div>
+                    <div class="use-case-item">IoT Communication</div>
+                </div>
+            </div>
 
             <div class="contact-info">
                 <div class="contact-label">CONTACT</div>
