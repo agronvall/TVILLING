@@ -84,7 +84,7 @@
             right: 2rem;
             top: 2rem;
             bottom: 2rem;
-            width: 400px;
+            width: 420px;
             background: rgba(0, 0, 0, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
@@ -111,8 +111,11 @@
 
         .video-list {
             flex: 1;
-            overflow-y: auto;
+            overflow-y: hidden;
             padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .video-list::-webkit-scrollbar {
@@ -135,7 +138,7 @@
 
         .video-item {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
         }
 
         .video-item:last-child {
@@ -144,7 +147,7 @@
 
         .video-frame {
             width: 100%;
-            height: 200px;
+            height: 250px;
             border: none;
             border-radius: 8px;
             background: #111;
@@ -519,67 +522,19 @@
 
     <div class="video-player">
         <div class="video-player-header">
-            <div class="video-player-title">DEMO VIDEOS</div>
+            <div class="video-player-title">DEMO VIDEO</div>
         </div>
 
         <div class="video-list">
             <div class="video-item">
                 <iframe class="video-frame"
-                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7317274213457788928?compact=1"
+                        src="https://www.youtube.com/embed/TnRcoMKz6tc"
                         frameborder="0"
                         allowfullscreen>
                 </iframe>
                 <div class="video-info">
-                    <div class="video-title">Real-time 3D Digital Twin</div>
-                    <div class="video-description">Experience our 3D digital twin technology with real-time camera integration and Three.js visualization.</div>
-                </div>
-            </div>
-
-            <div class="video-item">
-                <iframe class="video-frame"
-                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7327045924390637569?compact=1"
-                        frameborder="0"
-                        allowfullscreen>
-                </iframe>
-                <div class="video-info">
-                    <div class="video-title">IoT Data Integration</div>
-                    <div class="video-description">Seamless integration of IoT sensors and real-time data streams into digital twin environments.</div>
-                </div>
-            </div>
-
-            <div class="video-item">
-                <iframe class="video-frame"
-                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7340474950006247425?compact=1"
-                        frameborder="0"
-                        allowfullscreen>
-                </iframe>
-                <div class="video-info">
-                    <div class="video-title">Analytics Dashboard</div>
-                    <div class="video-description">Advanced analytics and monitoring capabilities for comprehensive digital twin insights.</div>
-                </div>
-            </div>
-
-            <div class="video-item">
-                <iframe class="video-frame"
-                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7372138036412891136?compact=1"
-                        frameborder="0"
-                        allowfullscreen>
-                </iframe>
-                <div class="video-info">
-                    <div class="video-title">Enterprise Demo</div>
-                    <div class="video-description">Enterprise-grade digital twin deployment showcasing scalability and performance.</div>
-                </div>
-            </div>
-
-            <div class="video-item">
-                <iframe class="video-frame"
-                        src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7373680075940130816?compact=1"
-                        frameborder="0"
-                        allowfullscreen>
-                </iframe>
-                <div class="video-info">
-                    <div class="video-title">Advanced Features</div>
-                    <div class="video-description">Cutting-edge features including AI integration and predictive analytics capabilities.</div>
+                    <div class="video-title">TVILLING Demo</div>
+                    <div class="video-description">Experience our digital twin technology in action with real-time visualization and seamless integration.</div>
                 </div>
             </div>
         </div>
