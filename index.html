@@ -644,41 +644,65 @@
                 }
             });
 
-            // First add the active class
+            // Store original parent for restoration
+            thumb.originalParent = thumb.parentNode;
+            thumb.originalNextSibling = thumb.nextSibling;
+
+            // Move video out of its parent container to avoid positioning conflicts
+            document.body.appendChild(thumb);
+
+            // Add the active class
             thumb.classList.add('active');
             overlay.classList.add('active');
 
-            // Force immediate positioning with requestAnimationFrame for proper timing
-            requestAnimationFrame(() => {
-                // Clear any existing positioning
-                thumb.style.cssText = '';
+            console.log('Opening video, applying styles...');
 
-                // Apply centering styles with maximum specificity
-                thumb.style.setProperty('position', 'fixed', 'important');
-                thumb.style.setProperty('top', '50%', 'important');
-                thumb.style.setProperty('left', '50%', 'important');
-                thumb.style.setProperty('transform', 'translate(-50%, -50%)', 'important');
-                thumb.style.setProperty('width', '560px', 'important');
-                thumb.style.setProperty('height', '350px', 'important');
-                thumb.style.setProperty('z-index', '1000', 'important');
-                thumb.style.setProperty('right', 'auto', 'important');
-                thumb.style.setProperty('bottom', 'auto', 'important');
-                thumb.style.setProperty('background', '#000', 'important');
-                thumb.style.setProperty('border', '2px solid #00ffff', 'important');
+            // Apply styles immediately with brute force
+            thumb.style.cssText = `
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                width: 560px !important;
+                height: 350px !important;
+                z-index: 1000 !important;
+                background: #000 !important;
+                border: 2px solid #00ffff !important;
+                box-shadow: 0 20px 60px rgba(0, 255, 255, 0.4) !important;
+                margin: 0 !important;
+                right: auto !important;
+                bottom: auto !important;
+            `;
 
-                // Ensure iframe is visible and ready
-                const iframe = thumb.querySelector('iframe');
-                iframe.style.display = 'block';
-                iframe.style.pointerEvents = 'auto';
-            });
+            // Ensure iframe is visible and ready
+            const iframe = thumb.querySelector('iframe');
+            iframe.style.display = 'block';
+            iframe.style.pointerEvents = 'auto';
+
+            console.log('Video styles applied:', thumb.style.cssText);
         }
 
         function closeVideo(thumb) {
             thumb.classList.remove('active');
             overlay.classList.remove('active');
 
+            console.log('Closing video, restoring to original position...');
+
+            // Restore video to its original parent and position
+            if (thumb.originalParent) {
+                if (thumb.originalNextSibling) {
+                    thumb.originalParent.insertBefore(thumb, thumb.originalNextSibling);
+                } else {
+                    thumb.originalParent.appendChild(thumb);
+                }
+            }
+
             // Completely reset all inline styles
             thumb.style.cssText = '';
+
+            // Clean up references
+            delete thumb.originalParent;
+            delete thumb.originalNextSibling;
         }
 
         overlay.addEventListener('click', () => {
