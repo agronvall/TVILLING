@@ -549,18 +549,40 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+
             .container {
                 flex-direction: column;
-                justify-content: center;
+                justify-content: flex-start;
                 text-align: center;
+                min-height: 100vh;
+                padding: 2rem 5% 8rem 5%;
             }
 
             .left-content {
-                max-width: 90%;
+                max-width: 100%;
+                margin-bottom: 2rem;
+            }
+
+            .logo {
+                margin-bottom: 2rem;
+            }
+
+            h1 {
+                font-size: clamp(2.5rem, 8vw, 3.5rem);
+                margin-bottom: 1rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+                margin-top: 1rem;
             }
 
             .use-cases {
-                margin-top: 2rem;
+                margin-top: 1.5rem;
                 margin-bottom: 1rem;
             }
 
@@ -591,11 +613,15 @@
             }
 
             .video-player {
-                right: 1rem;
-                left: 1rem;
-                top: 1rem;
-                bottom: 1rem;
-                width: auto;
+                position: relative;
+                right: auto;
+                left: auto;
+                top: auto;
+                bottom: auto;
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+                height: 300px;
             }
 
             .video-item {
@@ -603,10 +629,17 @@
             }
 
             .video-frame {
-                height: 180px;
+                height: 200px;
             }
 
             .nav {
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                left: auto;
+            }
+
+            #canvas-container {
                 display: none;
             }
         }
