@@ -437,31 +437,31 @@
 
     <div class="video-strip">
         <div class="video-thumb" data-video="7317274213457788928">
-            <iframe src="" data-src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7317274213457788928?compact=1" allowfullscreen></iframe>
+            <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7317274213457788928?compact=1" allowfullscreen frameborder="0"></iframe>
             <div class="video-indicator"></div>
             <div class="video-label">Real-time 3D</div>
             <div class="close-btn"></div>
         </div>
         <div class="video-thumb" data-video="7327045924390637569">
-            <iframe src="" data-src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7327045924390637569?compact=1" allowfullscreen></iframe>
+            <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7327045924390637569?compact=1" allowfullscreen frameborder="0"></iframe>
             <div class="video-indicator"></div>
             <div class="video-label">IoT Integration</div>
             <div class="close-btn"></div>
         </div>
         <div class="video-thumb" data-video="7340474950006247425">
-            <iframe src="" data-src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7340474950006247425?compact=1" allowfullscreen></iframe>
+            <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7340474950006247425?compact=1" allowfullscreen frameborder="0"></iframe>
             <div class="video-indicator"></div>
             <div class="video-label">Analytics</div>
             <div class="close-btn"></div>
         </div>
         <div class="video-thumb" data-video="7372138036412891136">
-            <iframe src="" data-src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7372138036412891136?compact=1" allowfullscreen></iframe>
+            <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7372138036412891136?compact=1" allowfullscreen frameborder="0"></iframe>
             <div class="video-indicator"></div>
             <div class="video-label">Demo Video 4</div>
             <div class="close-btn"></div>
         </div>
         <div class="video-thumb" data-video="7373680075940130816">
-            <iframe src="" data-src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7373680075940130816?compact=1" allowfullscreen></iframe>
+            <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7373680075940130816?compact=1" allowfullscreen frameborder="0"></iframe>
             <div class="video-indicator"></div>
             <div class="video-label">Demo Video 5</div>
             <div class="close-btn"></div>
@@ -657,16 +657,10 @@
             thumb.style.right = 'auto';
             thumb.style.bottom = 'auto';
 
-            // Load iframe src immediately for better compatibility
-            const iframe = thumb.querySelector('iframe');
-            if (!iframe.src || iframe.src === '') {
-                iframe.src = iframe.dataset.src;
-            }
             // Ensure iframe is visible and ready
-            setTimeout(() => {
-                iframe.style.display = 'block';
-                iframe.style.pointerEvents = 'auto';
-            }, 100);
+            const iframe = thumb.querySelector('iframe');
+            iframe.style.display = 'block';
+            iframe.style.pointerEvents = 'auto';
         }
 
         function closeVideo(thumb) {
