@@ -1,8 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="frame-src 'self' https://www.linkedin.com https://*.linkedin.com; frame-ancestors 'self' https://www.linkedin.com https://*.linkedin.com; script-src 'self' 'unsafe-inline' https://www.linkedin.com https://*.linkedin.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
     <title>TVILLING - Digital Twins Simplified</title>
     <meta name="description" content="Deploy enterprise-grade digital twins in minutes, not months. 10x lighter. 100% GDPR compliant. Zero complexity.">
 
@@ -454,6 +455,18 @@
             <div class="video-label">Analytics</div>
             <div class="close-btn"></div>
         </div>
+        <div class="video-thumb" data-video="7372138036412891136">
+            <iframe src="" data-src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7372138036412891136?compact=1" allowfullscreen></iframe>
+            <div class="video-indicator"></div>
+            <div class="video-label">Demo Video 4</div>
+            <div class="close-btn"></div>
+        </div>
+        <div class="video-thumb" data-video="7373680075940130816">
+            <iframe src="" data-src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7373680075940130816?compact=1" allowfullscreen></iframe>
+            <div class="video-indicator"></div>
+            <div class="video-label">Demo Video 5</div>
+            <div class="close-btn"></div>
+        </div>
     </div>
 
     <script>
@@ -645,11 +658,16 @@
             thumb.style.right = 'auto';
             thumb.style.bottom = 'auto';
 
-            // Load iframe src
+            // Load iframe src immediately for better compatibility
             const iframe = thumb.querySelector('iframe');
-            if (!iframe.src) {
+            if (!iframe.src || iframe.src === '') {
                 iframe.src = iframe.dataset.src;
             }
+            // Ensure iframe is visible and ready
+            setTimeout(() => {
+                iframe.style.display = 'block';
+                iframe.style.pointerEvents = 'auto';
+            }, 100);
         }
 
         function closeVideo(thumb) {
