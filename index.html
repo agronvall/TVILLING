@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="frame-src 'self' https://www.linkedin.com https://*.linkedin.com; frame-ancestors 'self' https://www.linkedin.com https://*.linkedin.com; script-src 'self' 'unsafe-inline' https://www.linkedin.com https://*.linkedin.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
     <title>TVILLING - Digital Twins Simplified</title>
     <meta name="description" content="Deploy enterprise-grade digital twins in minutes, not months. 10x lighter. 100% GDPR compliant. Zero complexity.">
 
@@ -473,10 +472,6 @@
         // Three.js 3D Building
         let scene, camera, renderer, building, wireframeBuilding, particles;
         let floors = [];
-        let parkingSpots = [];
-        let cameras = [];
-        let alarms = [];
-        let dataStreams = [];
 
         function initThree() {
             scene = new THREE.Scene();
@@ -491,111 +486,99 @@
             building = new THREE.Group();
             building.position.x = 15;
 
-            // Main building structure
-            const buildingGeometry = new THREE.BoxGeometry(8, 12, 6);
+            // Main building structure - sleek modern design
+            const buildingGeometry = new THREE.BoxGeometry(10, 15, 8);
             const buildingEdges = new THREE.EdgesGeometry(buildingGeometry);
             const buildingMaterial = new THREE.LineBasicMaterial({
                 color: 0xffffff,
-                linewidth: 1,
+                linewidth: 2,
                 transparent: true,
-                opacity: 0.3
+                opacity: 0.4
             });
             wireframeBuilding = new THREE.LineSegments(buildingEdges, buildingMaterial);
             building.add(wireframeBuilding);
 
-            // Add floor divisions
-            for (let i = 0; i < 6; i++) {
-                const floorGeometry = new THREE.PlaneGeometry(8, 6);
+            // Add minimal floor divisions
+            for (let i = 0; i < 8; i++) {
+                const floorGeometry = new THREE.PlaneGeometry(10, 8);
                 const floorEdges = new THREE.EdgesGeometry(floorGeometry);
                 const floorMaterial = new THREE.LineBasicMaterial({
                     color: 0x00ffff,
                     transparent: true,
-                    opacity: 0.2
+                    opacity: 0.15
                 });
                 const floor = new THREE.LineSegments(floorEdges, floorMaterial);
-                floor.position.set(0, -6 + i * 2.4, 0);
+                floor.position.set(0, -7.5 + i * 1.875, 0);
                 floor.rotation.x = Math.PI / 2;
                 floors.push(floor);
                 building.add(floor);
             }
 
-            // Add windows as small rectangles
+            // Add minimal clean windows
             const windowGroup = new THREE.Group();
-            for (let floor = 0; floor < 5; floor++) {
-                for (let window = 0; window < 4; window++) {
-                    const windowGeometry = new THREE.PlaneGeometry(0.8, 1.2);
+            for (let floor = 0; floor < 7; floor++) {
+                for (let window = 0; window < 5; window++) {
+                    const windowGeometry = new THREE.PlaneGeometry(1.2, 1.4);
                     const windowMaterial = new THREE.MeshBasicMaterial({
                         color: 0x00ffff,
                         transparent: true,
-                        opacity: Math.random() * 0.3 + 0.1,
+                        opacity: 0.1 + Math.random() * 0.2,
                         side: THREE.DoubleSide
                     });
                     const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial);
                     windowMesh.position.set(
-                        (window - 1.5) * 1.8,
-                        -4 + floor * 2.4,
-                        3.01
+                        (window - 2) * 1.8,
+                        -6 + floor * 1.875,
+                        4.01
                     );
                     windowGroup.add(windowMesh);
 
                     // Add back windows
                     const backWindow = windowMesh.clone();
-                    backWindow.position.z = -3.01;
+                    backWindow.position.z = -4.01;
                     windowGroup.add(backWindow);
                 }
             }
             building.add(windowGroup);
             scene.add(building);
 
-            // Create parking area with dynamic occupancy
-            createParkingArea();
-
-            // Add security cameras
-            createSecurityCameras();
-
-            // Add alarm systems
-            createAlarmSystems();
-
-            // Add IoT data streams
-            createDataStreams();
-
-            // Add floating data points
+            // Add minimal ambient particles
             const particlesGeometry = new THREE.BufferGeometry();
-            const particleCount = 500;
+            const particleCount = 200;
             const positions = new Float32Array(particleCount * 3);
             const colors = new Float32Array(particleCount * 3);
 
             for(let i = 0; i < particleCount * 3; i += 3) {
-                positions[i] = (Math.random() - 0.5) * 40;
-                positions[i + 1] = (Math.random() - 0.5) * 30;
-                positions[i + 2] = (Math.random() - 0.5) * 30;
+                positions[i] = (Math.random() - 0.5) * 50;
+                positions[i + 1] = (Math.random() - 0.5) * 35;
+                positions[i + 2] = (Math.random() - 0.5) * 35;
 
                 colors[i] = 0;
-                colors[i + 1] = Math.random() * 0.5 + 0.5;
-                colors[i + 2] = Math.random() * 0.5 + 0.5;
+                colors[i + 1] = Math.random() * 0.3 + 0.7;
+                colors[i + 2] = Math.random() * 0.3 + 0.7;
             }
 
             particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
             const particlesMaterial = new THREE.PointsMaterial({
-                size: 0.5,
+                size: 0.3,
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.6,
+                opacity: 0.4,
                 blending: THREE.AdditiveBlending
             });
 
             particles = new THREE.Points(particlesGeometry, particlesMaterial);
             scene.add(particles);
 
-            // Add grid floor
-            const gridHelper = new THREE.GridHelper(50, 30, 0x444444, 0x222222);
-            gridHelper.position.y = -6;
+            // Add subtle grid floor
+            const gridHelper = new THREE.GridHelper(60, 40, 0x333333, 0x111111);
+            gridHelper.position.y = -7.5;
             scene.add(gridHelper);
 
-            camera.position.set(-10, 0, 20);
-            camera.lookAt(10, 0, 0);
+            camera.position.set(-12, 2, 25);
+            camera.lookAt(15, 0, 0);
 
             animate();
         }
@@ -603,272 +586,26 @@
         function animate() {
             requestAnimationFrame(animate);
 
-            const time = Date.now() * 0.001;
-
             // Rotate the entire building group (wireframe, floors, and windows together)
             if (building) {
-                building.rotation.y += 0.002;
+                building.rotation.y += 0.001;
             }
 
             // Individual floor rotations are now relative to the building group
             floors.forEach((floor, index) => {
-                floor.rotation.z += 0.001 * (index + 1) * 0.2;
-            });
-
-            // Animate parking occupancy changes
-            parkingSpots.forEach(spot => {
-                spot.changeTimer--;
-                if (spot.changeTimer <= 0) {
-                    // Randomly change parking spot status
-                    if (Math.random() < 0.01) {
-                        spot.occupied = !spot.occupied;
-                        spot.spot.material.color.setHex(spot.occupied ? 0xff3333 : 0x33ff33);
-                        spot.changeTimer = 300 + Math.random() * 200;
-                    }
-                }
-                // Pulsing sensor animation
-                spot.sensor.material.opacity = 0.5 + Math.sin(time * 3 + spot.sensor.position.x) * 0.3;
-            });
-
-            // Animate security cameras
-            cameras.forEach(camera => {
-                camera.scanAngle += camera.scanSpeed;
-                camera.group.rotation.y = Math.sin(camera.scanAngle) * 0.8;
-                camera.cone.material.opacity = 0.05 + Math.sin(time * 2 + camera.scanAngle) * 0.05;
-            });
-
-            // Animate alarm systems
-            alarms.forEach(alarm => {
-                alarm.pulsePhase += 0.1;
-                if (alarm.alertState) {
-                    // Red alert pulsing
-                    alarm.light.material.opacity = 0.6 + Math.sin(alarm.pulsePhase * 3) * 0.4;
-                } else {
-                    // Green steady with subtle pulse
-                    alarm.light.material.opacity = 0.7 + Math.sin(alarm.pulsePhase) * 0.1;
-                }
-                // Data line animation
-                alarm.line.material.opacity = 0.2 + Math.sin(time * 2 + alarm.pulsePhase) * 0.2;
-            });
-
-            // Animate data streams
-            dataStreams.forEach(stream => {
-                stream.targetAngle += stream.speed;
-                stream.mesh.position.x = Math.cos(stream.targetAngle) * stream.radius;
-                stream.mesh.position.z = Math.sin(stream.targetAngle) * stream.radius;
-                stream.mesh.position.y = stream.height + Math.sin(time * 2 + stream.targetAngle) * 2;
-
-                // Pulsing data packets
-                const scale = 1 + Math.sin(time * 4 + stream.targetAngle) * 0.3;
-                stream.mesh.scale.set(scale, scale, scale);
+                floor.rotation.z += 0.0005 * (index + 1) * 0.2;
             });
 
             if (particles) {
-                particles.rotation.y += 0.0005;
+                particles.rotation.y += 0.0003;
                 const positions = particles.geometry.attributes.position.array;
                 for(let i = 1; i < positions.length; i += 3) {
-                    positions[i] += Math.sin(time + i) * 0.01;
+                    positions[i] += Math.sin(Date.now() * 0.0005 + i) * 0.005;
                 }
                 particles.geometry.attributes.position.needsUpdate = true;
             }
 
             renderer.render(scene, camera);
-        }
-
-        // Create parking area with occupancy sensors
-        function createParkingArea() {
-            const parkingGroup = new THREE.Group();
-            parkingGroup.position.set(-15, -6, 5);
-
-            // Create parking spots (3x4 grid)
-            for (let row = 0; row < 3; row++) {
-                for (let col = 0; col < 4; col++) {
-                    const spotGeometry = new THREE.PlaneGeometry(2.5, 4.5);
-                    const spotMaterial = new THREE.MeshBasicMaterial({
-                        color: Math.random() > 0.6 ? 0xff3333 : 0x33ff33, // Random occupied/free
-                        transparent: true,
-                        opacity: 0.6,
-                        side: THREE.DoubleSide
-                    });
-                    const spot = new THREE.Mesh(spotGeometry, spotMaterial);
-                    spot.position.set(col * 3, 0.01, row * 5);
-                    spot.rotation.x = -Math.PI / 2;
-
-                    // Add sensor indicator
-                    const sensorGeometry = new THREE.CircleGeometry(0.3, 8);
-                    const sensorMaterial = new THREE.MeshBasicMaterial({
-                        color: 0x00ffff,
-                        transparent: true,
-                        opacity: 0.8
-                    });
-                    const sensor = new THREE.Mesh(sensorGeometry, sensorMaterial);
-                    sensor.position.set(col * 3, 0.02, row * 5);
-                    sensor.rotation.x = -Math.PI / 2;
-
-                    parkingSpots.push({
-                        spot: spot,
-                        sensor: sensor,
-                        occupied: spotMaterial.color.r > 0.5,
-                        changeTimer: Math.random() * 100
-                    });
-
-                    parkingGroup.add(spot);
-                    parkingGroup.add(sensor);
-                }
-            }
-            scene.add(parkingGroup);
-        }
-
-        // Create security cameras with scanning animations
-        function createSecurityCameras() {
-            const cameraPositions = [
-                { x: -5, y: 8, z: 8 },
-                { x: 25, y: 8, z: 8 },
-                { x: 10, y: 12, z: -8 },
-                { x: -10, y: 6, z: 15 }
-            ];
-
-            cameraPositions.forEach((pos, index) => {
-                const cameraGroup = new THREE.Group();
-
-                // Camera body
-                const bodyGeometry = new THREE.BoxGeometry(1, 0.8, 1.5);
-                const bodyMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x333333,
-                    transparent: true,
-                    opacity: 0.8
-                });
-                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-
-                // Camera lens
-                const lensGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.2, 8);
-                const lensMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x000000,
-                    transparent: true,
-                    opacity: 0.9
-                });
-                const lens = new THREE.Mesh(lensGeometry, lensMaterial);
-                lens.position.z = 0.85;
-                lens.rotation.x = Math.PI / 2;
-
-                // Camera scanning cone
-                const coneGeometry = new THREE.ConeGeometry(3, 8, 8, 1, true);
-                const coneMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x00ffff,
-                    transparent: true,
-                    opacity: 0.1,
-                    side: THREE.DoubleSide
-                });
-                const cone = new THREE.Mesh(coneGeometry, coneMaterial);
-                cone.position.z = 4;
-                cone.rotation.x = Math.PI / 2;
-
-                cameraGroup.add(body);
-                cameraGroup.add(lens);
-                cameraGroup.add(cone);
-                cameraGroup.position.set(pos.x, pos.y, pos.z);
-
-                cameras.push({
-                    group: cameraGroup,
-                    cone: cone,
-                    scanAngle: 0,
-                    scanSpeed: 0.02 + Math.random() * 0.01
-                });
-
-                scene.add(cameraGroup);
-            });
-        }
-
-        // Create alarm systems with status indicators
-        function createAlarmSystems() {
-            const alarmPositions = [
-                { x: 0, y: 15, z: 0 },
-                { x: -20, y: 4, z: 10 },
-                { x: 20, y: 4, z: -5 }
-            ];
-
-            alarmPositions.forEach((pos, index) => {
-                const alarmGroup = new THREE.Group();
-
-                // Alarm base
-                const baseGeometry = new THREE.CylinderGeometry(0.5, 0.5, 0.3, 8);
-                const baseMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x444444
-                });
-                const base = new THREE.Mesh(baseGeometry, baseMaterial);
-
-                // Status light
-                const lightGeometry = new THREE.SphereGeometry(0.3, 8, 8);
-                const lightMaterial = new THREE.MeshBasicMaterial({
-                    color: Math.random() > 0.8 ? 0xff0000 : 0x00ff00, // Occasional red alerts
-                    transparent: true,
-                    opacity: 0.8
-                });
-                const light = new THREE.Mesh(lightGeometry, lightMaterial);
-                light.position.y = 0.4;
-
-                // Data transmission lines
-                const lineGeometry = new THREE.BufferGeometry();
-                const linePositions = new Float32Array([
-                    0, 0.7, 0,
-                    building.position.x, 6, 0
-                ]);
-                lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-                const lineMaterial = new THREE.LineBasicMaterial({
-                    color: 0x00ffff,
-                    transparent: true,
-                    opacity: 0.4
-                });
-                const line = new THREE.Line(lineGeometry, lineMaterial);
-
-                alarmGroup.add(base);
-                alarmGroup.add(light);
-                alarmGroup.add(line);
-                alarmGroup.position.set(pos.x, pos.y, pos.z);
-
-                alarms.push({
-                    group: alarmGroup,
-                    light: light,
-                    line: line,
-                    pulsePhase: Math.random() * Math.PI * 2,
-                    alertState: lightMaterial.color.r > 0.5
-                });
-
-                scene.add(alarmGroup);
-            });
-        }
-
-        // Create data streams between IoT devices
-        function createDataStreams() {
-            // Create floating data packets
-            for (let i = 0; i < 20; i++) {
-                const packetGeometry = new THREE.SphereGeometry(0.1, 4, 4);
-                const packetMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x00ffff,
-                    transparent: true,
-                    opacity: 0.8
-                });
-                const packet = new THREE.Mesh(packetGeometry, packetMaterial);
-
-                // Random position around the building
-                const angle = (i / 20) * Math.PI * 2;
-                const radius = 12 + Math.random() * 8;
-                packet.position.set(
-                    Math.cos(angle) * radius,
-                    -2 + Math.random() * 8,
-                    Math.sin(angle) * radius
-                );
-
-                dataStreams.push({
-                    mesh: packet,
-                    targetAngle: angle,
-                    speed: 0.02 + Math.random() * 0.02,
-                    radius: radius,
-                    height: packet.position.y
-                });
-
-                scene.add(packet);
-            }
         }
 
         initThree();
