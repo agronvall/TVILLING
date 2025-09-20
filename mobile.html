@@ -512,15 +512,14 @@
                 // Scale context for high DPI
                 context.scale(scale, scale);
 
-                // Draw text on canvas with higher DPI - no borders/edges
-                // Simple dark background without borders
-                context.fillStyle = 'rgba(0, 0, 0, 0.85)';
-                context.fillRect(0, 0, 512, 128);
+                // Draw plain text on transparent canvas - no background boxes
+                // Make canvas completely transparent
+                context.clearRect(0, 0, 512, 128);
 
                 context.font = 'bold 36px Inter';
                 context.fillStyle = '#ffffff';
-                context.shadowColor = 'rgba(0, 255, 255, 0.5)';
-                context.shadowBlur = 3;
+                context.shadowColor = 'rgba(0, 255, 255, 0.8)';
+                context.shadowBlur = 8;
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
                 context.fillText(text, 256, 64);
