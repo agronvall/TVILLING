@@ -422,9 +422,19 @@
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true,
+                powerPreference: "high-performance",
+                stencil: false,
+                depth: true,
+                logarithmicDepthBuffer: false
+            });
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for stability
             renderer.setClearColor(0x000000, 0);
+            renderer.sortObjects = true; // Enable object sorting for proper transparency
+            renderer.shadowMap.enabled = false; // Disable shadows for better performance
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
             // Raycaster for interaction
@@ -493,12 +503,17 @@
                 context.scale(scale, scale);
 
                 // Draw text on canvas with higher DPI
-                context.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                // Gradient background for depth
+                const gradient = context.createLinearGradient(0, 0, 0, 128);
+                gradient.addColorStop(0, 'rgba(0, 20, 40, 0.95)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0.95)');
+                context.fillStyle = gradient;
                 context.fillRect(0, 0, 512, 128);
 
-                context.strokeStyle = 'rgba(0, 255, 255, 0.6)';
-                context.lineWidth = 2;
-                context.strokeRect(2, 2, 508, 124);
+                // Subtle glow border
+                context.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+                context.lineWidth = 1;
+                context.strokeRect(1, 1, 510, 126);
 
                 context.font = 'bold 36px Inter';
                 context.fillStyle = '#ffffff';
@@ -508,14 +523,21 @@
                 context.textBaseline = 'middle';
                 context.fillText(text, 256, 64);
 
-                // Create sprite from canvas
+                // Create sprite from canvas with anti-flicker settings
                 const texture = new THREE.CanvasTexture(canvas);
                 texture.minFilter = THREE.LinearFilter;
                 texture.magFilter = THREE.LinearFilter;
+                texture.flipY = false; // Prevent texture flipping artifacts
+                texture.generateMipmaps = false; // Disable mipmaps for better stability
+
                 const spriteMaterial = new THREE.SpriteMaterial({
                     map: texture,
                     transparent: true,
-                    opacity: 0.95
+                    opacity: 0.95,
+                    alphaTest: 0.1, // Prevent transparent edge artifacts
+                    depthTest: false, // Prevent depth buffer conflicts
+                    depthWrite: false, // Disable depth writing
+                    blending: THREE.NormalBlending // Use stable blending mode
                 });
                 const sprite = new THREE.Sprite(spriteMaterial);
                 sprite.scale.set(5, 1.25, 1);
@@ -536,10 +558,11 @@
                     angle: angle,
                     radius: radius + (Math.random() - 0.5) * 3,
                     height: height,
-                    speed: 0.001 + Math.random() * 0.0015,
-                    verticalSpeed: 0.0005 * (Math.random() - 0.5),
+                    speed: 0.0008 + Math.random() * 0.0004,
+                    verticalSpeed: 0.0002 * (Math.random() - 0.5),
                     index: index,
-                    originalOpacity: 0.9
+                    originalOpacity: 0.95,
+                    phase: Math.random() * Math.PI * 2
                 };
 
                 scene.add(sprite);
@@ -597,33 +620,57 @@
                 particles.rotation.x += 0.0002;
             }
 
-            // Orbit text around building
+            // Orbit text around building with ultra-smooth animation
             textMeshes.forEach((sprite, index) => {
                 const userData = sprite.userData;
+                const time = Date.now() * 0.001;
+
+                // Ultra-smooth orbital motion with lerping
                 userData.angle += userData.speed;
 
-                // Update position
-                sprite.position.x = Math.cos(userData.angle) * userData.radius;
-                sprite.position.z = Math.sin(userData.angle) * userData.radius;
+                // Smooth elliptical orbit with stable positioning
+                const radiusX = userData.radius;
+                const radiusZ = userData.radius * 0.8;
+                const targetX = Math.cos(userData.angle) * radiusX;
+                const targetZ = Math.sin(userData.angle) * radiusZ;
 
-                // Gentle vertical movement
-                sprite.position.y = userData.height + Math.sin(Date.now() * 0.001 + index) * 0.5;
+                // Apply linear interpolation for super smooth movement
+                sprite.position.x += (targetX - sprite.position.x) * 0.02;
+                sprite.position.z += (targetZ - sprite.position.z) * 0.02;
 
-                // Make sprite always face camera
-                sprite.lookAt(camera.position);
+                // Ultra-smooth wave motion for vertical movement
+                const verticalWave = Math.sin(time * 0.3 + userData.phase) * 0.2;
+                const targetY = userData.height + verticalWave;
+                sprite.position.y += (targetY - sprite.position.y) * 0.05;
 
-                // Fade based on distance from camera
-                const distance = sprite.position.distanceTo(camera.position);
-                sprite.material.opacity = userData.originalOpacity * (1 - (distance - 25) / 25);
-                sprite.material.opacity = Math.max(0.4, Math.min(userData.originalOpacity, sprite.material.opacity));
+                // Smooth rotation towards camera without jitter
+                const direction = new THREE.Vector3().subVectors(camera.position, sprite.position).normalize();
+                sprite.lookAt(sprite.position.clone().add(direction));
 
-                // Pulse selected item
+                // Ultra-stable opacity system
+                const distanceFromCamera = sprite.position.distanceTo(camera.position);
+                const normalizedDistance = Math.min(distanceFromCamera / 40, 1);
+                const stabilizedOpacity = 0.85 + (1 - normalizedDistance) * 0.15;
+
+                // Smooth state transitions
                 if (selectedObject === sprite) {
-                    sprite.material.opacity = 0.95 + Math.sin(Date.now() * 0.01) * 0.05;
-                    sprite.material.color = new THREE.Color(0x00ffff);
+                    sprite.material.opacity += (1 - sprite.material.opacity) * 0.1;
+                    const targetColor = new THREE.Color(0x00ffff);
+                    sprite.material.color.lerp(targetColor, 0.05);
                 } else {
-                    sprite.material.color = new THREE.Color(0xffffff);
+                    sprite.material.opacity += (stabilizedOpacity - sprite.material.opacity) * 0.05;
+                    const targetColor = new THREE.Color(0xffffff);
+                    sprite.material.color.lerp(targetColor, 0.05);
                 }
+
+                // Advanced anti-flicker rendering settings
+                sprite.material.depthTest = false;
+                sprite.material.depthWrite = false;
+                sprite.material.alphaTest = 0.1;
+                sprite.renderOrder = 1000 + index;
+
+                // Force material update to prevent edge flickering
+                sprite.material.needsUpdate = false;
             });
 
             renderer.render(scene, camera);
