@@ -63,26 +63,26 @@
         }
 
         .video-container {
-            width: 90%;
-            max-width: 400px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 85%;
+            max-width: 350px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(10px);
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.15);
             margin-bottom: 2rem;
         }
 
         .video-header {
             padding: 0.8rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
             text-align: center;
             font-size: 0.7rem;
             letter-spacing: 0.2em;
             font-weight: 400;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .video-frame {
@@ -231,10 +231,10 @@
             const buildingGeometry = new THREE.BoxGeometry(8, 12, 6);
             const buildingEdges = new THREE.EdgesGeometry(buildingGeometry);
             const buildingMaterial = new THREE.LineBasicMaterial({
-                color: 0xffffff,
-                linewidth: 1,
+                color: 0x00ffff,
+                linewidth: 2,
                 transparent: true,
-                opacity: 0.3
+                opacity: 0.6
             });
             const wireframeBuilding = new THREE.LineSegments(buildingEdges, buildingMaterial);
             building.add(wireframeBuilding);
@@ -277,19 +277,22 @@
             useCases.forEach((text, index) => {
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
-                canvas.width = 256;
-                canvas.height = 64;
+                canvas.width = 512;
+                canvas.height = 128;
 
-                // Draw text on canvas
-                context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                // Enable crisp text rendering
+                context.imageSmoothingEnabled = false;
+
+                // Draw text on canvas with higher DPI
+                context.fillStyle = 'rgba(0, 0, 0, 0.85)';
                 context.fillRect(0, 0, canvas.width, canvas.height);
 
-                context.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                context.lineWidth = 2;
-                context.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
+                context.strokeStyle = 'rgba(0, 255, 255, 0.4)';
+                context.lineWidth = 3;
+                context.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
 
-                context.font = '18px Inter';
-                context.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                context.font = 'bold 32px Inter';
+                context.fillStyle = 'rgba(255, 255, 255, 1)';
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
                 context.fillText(text, canvas.width / 2, canvas.height / 2);
