@@ -72,6 +72,16 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0, 255, 255, 0.15);
             margin-bottom: 2rem;
+            display: none;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .video-container.active {
+            display: block;
+            opacity: 1;
+            transform: scale(1) translateY(0);
         }
 
         .video-header {
@@ -162,6 +172,77 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
+        .play-video-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.5);
+            border-radius: 30px;
+            color: #00ffff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .play-video-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: #00ffff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .play-video-btn.hidden {
+            display: none;
+        }
+
+        .close-video-btn {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .close-video-btn:hover {
+            background: rgba(255, 0, 0, 0.4);
+            border-color: rgba(255, 0, 0, 0.6);
+            transform: rotate(90deg);
+        }
+
+        .close-video-btn::before,
+        .close-video-btn::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 2px;
+            background: #fff;
+        }
+
+        .close-video-btn::before {
+            transform: rotate(45deg);
+        }
+
+        .close-video-btn::after {
+            transform: rotate(-45deg);
+        }
+
         /* Responsive adjustments */
         @media (max-height: 700px) {
             .video-frame {
@@ -190,7 +271,8 @@
     <a href="index.html?desktop=true" class="desktop-link">Desktop</a>
 
     <div class="content-layer">
-        <div class="video-container">
+        <div class="video-container" id="videoContainer">
+            <div class="close-video-btn" onclick="hideVideo()"></div>
             <div class="video-header">DEMO VIDEO</div>
             <iframe class="video-frame"
                     src="https://www.youtube.com/embed/TnRcoMKz6tc"
@@ -199,6 +281,10 @@
             </iframe>
         </div>
     </div>
+
+    <button class="play-video-btn" id="playBtn" onclick="showVideo()">
+        ▶ Play Video
+    </button>
 
     <div class="contact-float" onclick="copyEmail()">
         <span id="contactText">anton.mikael.gronvall@outlook.com</span>
@@ -450,6 +536,35 @@
 
         window.addEventListener('touchstart', onTouch, false);
         window.addEventListener('click', onTouch, false);
+
+        // Video show/hide functions
+        function showVideo() {
+            const videoContainer = document.getElementById('videoContainer');
+            const playBtn = document.getElementById('playBtn');
+
+            // Show video with animation
+            videoContainer.style.display = 'block';
+            setTimeout(() => {
+                videoContainer.classList.add('active');
+            }, 10);
+
+            // Hide play button
+            playBtn.classList.add('hidden');
+        }
+
+        function hideVideo() {
+            const videoContainer = document.getElementById('videoContainer');
+            const playBtn = document.getElementById('playBtn');
+
+            // Hide video with animation
+            videoContainer.classList.remove('active');
+            setTimeout(() => {
+                videoContainer.style.display = 'none';
+            }, 500);
+
+            // Show play button
+            playBtn.classList.remove('hidden');
+        }
 
         // Copy email function
         function copyEmail() {
