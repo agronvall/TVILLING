@@ -102,27 +102,35 @@
             display: block;
         }
 
-        .contact-float {
+        .bottom-buttons {
             position: fixed;
             bottom: 2rem;
             left: 50%;
             transform: translateX(-50%);
-            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .contact-float {
+            padding: 1rem 1.5rem;
             background: rgba(0, 0, 0, 0.9);
-            border: 1px solid rgba(0, 255, 255, 0.3);
+            border: 2px solid rgba(0, 255, 255, 0.3);
             border-radius: 30px;
             backdrop-filter: blur(20px);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #00ffff;
             cursor: pointer;
             transition: all 0.3s ease;
-            z-index: 100;
             box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .contact-float:hover {
             background: rgba(0, 255, 255, 0.1);
-            transform: translateX(-50%) translateY(-2px);
+            transform: translateY(-2px);
             box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
         }
 
@@ -173,30 +181,27 @@
         }
 
         .play-video-btn {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
             padding: 1rem 1.5rem;
-            background: rgba(0, 255, 255, 0.1);
-            border: 2px solid rgba(0, 255, 255, 0.5);
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(0, 255, 255, 0.3);
             border-radius: 30px;
             color: #00ffff;
             font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            z-index: 100;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
         }
 
         .play-video-btn:hover {
-            background: rgba(0, 255, 255, 0.2);
+            background: rgba(0, 255, 255, 0.1);
             border-color: #00ffff;
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
         }
 
         .play-video-btn.hidden {
@@ -282,12 +287,16 @@
         </div>
     </div>
 
-    <button class="play-video-btn" id="playBtn" onclick="showVideo()">
-        ▶ Play Video
-    </button>
+    <div class="bottom-buttons">
+        <button class="contact-float" onclick="copyEmail()">
+            <span>📧</span>
+            <span id="contactText">Contact</span>
+        </button>
 
-    <div class="contact-float" onclick="copyEmail()">
-        <span id="contactText">anton.mikael.gronvall@outlook.com</span>
+        <button class="play-video-btn" id="playBtn" onclick="showVideo()">
+            <span>▶</span>
+            <span>Demo Video</span>
+        </button>
     </div>
 
     <script>
@@ -573,10 +582,10 @@
                 const contactFloat = document.querySelector('.contact-float');
                 const contactText = document.getElementById('contactText');
                 contactFloat.classList.add('copied');
-                contactText.textContent = 'Copied!';
+                contactText.innerHTML = '✓ Copied!';
                 setTimeout(() => {
                     contactFloat.classList.remove('copied');
-                    contactText.textContent = email;
+                    contactText.innerHTML = 'Contact';
                 }, 2000);
             });
         }
