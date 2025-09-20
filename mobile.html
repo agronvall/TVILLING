@@ -306,8 +306,8 @@
 
                 // Set initial position in a circle around the building
                 const angle = (index / useCases.length) * Math.PI * 2;
-                const radius = 12;
-                const height = (index - 3.5) * 1.5;
+                const radius = 15;
+                const height = (index - 3.5) * 2;
 
                 sprite.position.set(
                     Math.cos(angle) * radius,
@@ -318,9 +318,9 @@
                 sprite.userData = {
                     text: text,
                     angle: angle,
-                    radius: radius + (Math.random() - 0.5) * 2,
+                    radius: radius + (Math.random() - 0.5) * 3,
                     height: height,
-                    speed: 0.001 + Math.random() * 0.001,
+                    speed: 0.001 + Math.random() * 0.0015,
                     verticalSpeed: 0.0005 * (Math.random() - 0.5),
                     index: index,
                     originalOpacity: 0.9
@@ -360,7 +360,7 @@
             particles = new THREE.Points(particlesGeometry, particlesMaterial);
             scene.add(particles);
 
-            camera.position.set(0, 0, 25);
+            camera.position.set(0, 0, 35);
             camera.lookAt(0, 0, 0);
 
             animate();
@@ -398,8 +398,8 @@
 
                 // Fade based on distance from camera
                 const distance = sprite.position.distanceTo(camera.position);
-                sprite.material.opacity = userData.originalOpacity * (1 - (distance - 20) / 20);
-                sprite.material.opacity = Math.max(0.3, Math.min(userData.originalOpacity, sprite.material.opacity));
+                sprite.material.opacity = userData.originalOpacity * (1 - (distance - 25) / 25);
+                sprite.material.opacity = Math.max(0.4, Math.min(userData.originalOpacity, sprite.material.opacity));
 
                 // Pulse selected item
                 if (selectedObject === sprite) {
