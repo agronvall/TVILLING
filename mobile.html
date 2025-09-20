@@ -502,18 +502,10 @@
                 // Scale context for high DPI
                 context.scale(scale, scale);
 
-                // Draw text on canvas with higher DPI
-                // Gradient background for depth
-                const gradient = context.createLinearGradient(0, 0, 0, 128);
-                gradient.addColorStop(0, 'rgba(0, 20, 40, 0.95)');
-                gradient.addColorStop(1, 'rgba(0, 0, 0, 0.95)');
-                context.fillStyle = gradient;
+                // Draw text on canvas with higher DPI - no borders/edges
+                // Simple dark background without borders
+                context.fillStyle = 'rgba(0, 0, 0, 0.85)';
                 context.fillRect(0, 0, 512, 128);
-
-                // Subtle glow border
-                context.strokeStyle = 'rgba(0, 255, 255, 0.3)';
-                context.lineWidth = 1;
-                context.strokeRect(1, 1, 510, 126);
 
                 context.font = 'bold 36px Inter';
                 context.fillStyle = '#ffffff';
@@ -527,7 +519,7 @@
                 const texture = new THREE.CanvasTexture(canvas);
                 texture.minFilter = THREE.LinearFilter;
                 texture.magFilter = THREE.LinearFilter;
-                texture.flipY = false; // Prevent texture flipping artifacts
+                texture.flipY = true; // Fix upside down text
                 texture.generateMipmaps = false; // Disable mipmaps for better stability
 
                 const spriteMaterial = new THREE.SpriteMaterial({
