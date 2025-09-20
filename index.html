@@ -646,6 +646,23 @@
     </style>
 </head>
 <body>
+    <script>
+        // Device detection and redirect
+        (function() {
+            // Check if forced desktop mode
+            if (window.location.search.includes('desktop=true')) {
+                return;
+            }
+
+            // Check if mobile device
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+            if (isMobile) {
+                window.location.replace('mobile.html');
+            }
+        })();
+    </script>
+
     <div class="nav">
         <a href="#" class="nav-item" onclick="openContactModal()">Contact</a>
     </div>

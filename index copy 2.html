@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVILLING - Digital Twin Platform | Real-time 3D Facility Management</title>
+    <meta name="description" content="GDPR-compliant digital twin platform for facility management. Real-time 3D visualization, IoT integration, and data analytics.">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066ff;
+            --primary-dark: #0052cc;
+            --secondary: #00d4ff;
+            --accent: #ff0066;
+            --bg-dark: #0a0a0a;
+            --bg-light: #ffffff;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8b8b;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%);
+            --gradient-3: linear-gradient(135deg, #ff0066 0%, #ff9933 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            cursor: default;
+        }
+
+        ::selection {
+            background: var(--primary);
+            color: var(--text-primary);
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--glass-border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(180deg, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0) 100%);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+
+        .nav.scrolled {
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(30px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-2);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        .cta-button {
+            padding: 0.8rem 2rem;
+            background: var(--gradient-2);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .hero {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            max-width: 1200px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.6rem 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #8b8b8b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            line-height: 1.6;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 1rem 2.5rem;
+            background: var(--gradient-2);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 1rem 2.5rem;
+            background: transparent;
+            border: 2px solid var(--glass-border);
+            border-radius: 50px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: var(--glass-bg);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .stats-section {
+            padding: 5rem 0;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #0f0f0f 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .features-section {
+            padding: 8rem 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 0%, #8b8b8b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-2);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .dashboard-preview {
+            padding: 8rem 0;
+            background: linear-gradient(180deg, #0f0f0f 0%, var(--bg-dark) 100%);
+        }
+
+        .dashboard-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 3rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            padding: 0.5rem 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .data-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+
+        .data-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .data-card-title {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .data-card-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .data-trend {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 255, 100, 0.1);
+            color: #00ff64;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .data-trend.negative {
+            background: rgba(255, 0, 100, 0.1);
+            color: #ff0064;
+        }
+
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+
+        .gdpr-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 9999;
+            transform: translateY(100%);
+            transition: transform 0.5s ease;
+        }
+
+        .gdpr-banner.show {
+            transform: translateY(0);
+        }
+
+        .gdpr-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        .gdpr-text {
+            flex: 1;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .gdpr-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .gdpr-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gdpr-accept {
+            background: var(--gradient-2);
+            color: white;
+        }
+
+        .gdpr-settings {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .gdpr-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .video-section {
+            padding: 8rem 0;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .video-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 102, 255, 0.2);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-info {
+            padding: 1.5rem;
+        }
+
+        .video-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .footer {
+            padding: 4rem 0 2rem;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #000000 100%);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-dark);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close::before,
+        .modal-close::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: var(--text-secondary);
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover::before,
+        .modal-close:hover::after {
+            background: var(--text-primary);
+        }
+
+        .modal-close::before {
+            transform: rotate(45deg);
+        }
+
+        .modal-close::after {
+            transform: rotate(-45deg);
+        }
+
+        .modal h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .contact-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .contact-link:hover {
+            color: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .features-grid,
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gdpr-banner {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .gdpr-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: particle-float 20s infinite linear;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loader">
+        <div class="loader"></div>
+        <div class="loading-text">Initializing Digital Twin</div>
+    </div>
+
+    <nav class="nav" id="navbar">
+        <div class="logo">TVILLING</div>
+        <div class="nav-menu">
+            <a href="#features" class="nav-item">Features</a>
+            <a href="#dashboard" class="nav-item">Dashboard</a>
+            <a href="#demos" class="nav-item">Demos</a>
+            <a href="#" class="nav-item" onclick="openModal('about')">About</a>
+            <a href="#" class="nav-item" onclick="openModal('contact')">Contact</a>
+            <button class="cta-button" onclick="openModal('demo')">Request Demo</button>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div id="canvas-container"></div>
+        <div class="hero-content">
+            <div class="hero-badge">🔒 100% GDPR Compliant</div>
+            <h1 class="hero-title">Digital Twin Excellence</h1>
+            <p class="hero-subtitle">Transform your facility management with real-time 3D visualization, IoT integration, and predictive analytics.</p>
+            <div class="hero-buttons">
+                <a href="#dashboard" class="btn-primary">View Dashboard</a>
+                <a href="#features" class="btn-secondary">Explore Features</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" data-target="99.9">0</div>
+                    <div class="stat-label">% Uptime</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-target="50">0</div>
+                    <div class="stat-label">ms Latency</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-target="10000">0</div>
+                    <div class="stat-label">+ IoT Devices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-target="100">0</div>
+                    <div class="stat-label">% GDPR Compliant</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Features</div>
+                <h2 class="section-title">Next-Gen Capabilities</h2>
+                <p class="section-subtitle">Cutting-edge technology for modern facility management</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Real-Time Monitoring</h3>
+                    <p class="feature-description">Live 3D visualization of your entire facility with millisecond updates from IoT sensors.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3 class="feature-title">GDPR Compliant</h3>
+                    <p class="feature-description">Full data sovereignty with encrypted storage, audit trails, and privacy-by-design architecture.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Predictive Analytics</h3>
+                    <p class="feature-description">AI-powered insights predict maintenance needs and optimize resource allocation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Edge Computing</h3>
+                    <p class="feature-description">Process data locally for ultra-low latency and reduced bandwidth consumption.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Seamless Integration</h3>
+                    <p class="feature-description">Connect with existing BMS, ERP, and IoT platforms through our universal API.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Cross-Platform</h3>
+                    <p class="feature-description">Access your digital twin from any device with responsive web and native apps.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard-preview" id="dashboard">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Dashboard</div>
+                <h2 class="section-title">Real-Time Intelligence</h2>
+                <p class="section-subtitle">Monitor, analyze, and optimize your facility in real-time</p>
+            </div>
+            <div class="dashboard-container">
+                <div class="dashboard-header">
+                    <h3 class="dashboard-title">Facility Overview</h3>
+                    <div class="dashboard-controls">
+                        <button class="control-btn">Last 24h</button>
+                        <button class="control-btn">Export</button>
+                        <button class="control-btn">Settings</button>
+                    </div>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <span class="data-card-title">Energy Usage</span>
+                            <span class="data-trend">-12%</span>
+                        </div>
+                        <div class="data-card-value">847 kWh</div>
+                        <div class="chart-container">
+                            <canvas id="energyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <span class="data-card-title">Occupancy Rate</span>
+                            <span class="data-trend">+8%</span>
+                        </div>
+                        <div class="data-card-value">76%</div>
+                        <div class="chart-container">
+                            <canvas id="occupancyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <span class="data-card-title">Air Quality</span>
+                            <span class="data-trend">Excellent</span>
+                        </div>
+                        <div class="data-card-value">98/100</div>
+                        <div class="chart-container">
+                            <canvas id="airQualityChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="data-card">
+                        <div class="data-card-header">
+                            <span class="data-card-title">Temperature</span>
+                            <span class="data-trend">Optimal</span>
+                        </div>
+                        <div class="data-card-value">22.3°C</div>
+                        <div class="chart-container">
+                            <canvas id="temperatureChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="video-section" id="demos">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Demos</div>
+                <h2 class="section-title">See It In Action</h2>
+                <p class="section-subtitle">Real-world implementations of our digital twin technology</p>
+            </div>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-wrapper">
+                        <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7317274213457788928?compact=1"
+                                allowfullscreen></iframe>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Digital Twin Showcase</h3>
+                        <p class="video-description">Real-time camera integration with Three.js</p>
+                    </div>
+                </div>
+                <div class="video-card">
+                    <div class="video-wrapper">
+                        <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7327045924390637569?compact=1"
+                                allowfullscreen></iframe>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">IoT Integration</h3>
+                        <p class="video-description">Seamless sensor data visualization</p>
+                    </div>
+                </div>
+                <div class="video-card">
+                    <div class="video-wrapper">
+                        <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7340474950006247425?compact=1"
+                                allowfullscreen></iframe>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Advanced Analytics</h3>
+                        <p class="video-description">Predictive maintenance in action</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Product</h3>
+                    <ul class="footer-links">
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#dashboard">Dashboard</a></li>
+                        <li><a href="#demos">Demos</a></li>
+                        <li><a href="#">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="openModal('about')">About</a></li>
+                        <li><a href="#" onclick="openModal('contact')">Contact</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">GDPR Compliance</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">LinkedIn</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="mailto:anton.mikael.gronvall@outlook.com">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 TVILLING. All rights reserved. Built with passion for digital innovation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="gdpr-banner" id="gdprBanner">
+        <div class="gdpr-content">
+            <div class="gdpr-text">
+                We value your privacy. This site uses cookies to enhance your experience and analyze site usage in compliance with GDPR regulations.
+                All data processing is transparent and you maintain full control over your information.
+            </div>
+        </div>
+        <div class="gdpr-buttons">
+            <button class="gdpr-btn gdpr-settings" onclick="openModal('privacy')">Privacy Settings</button>
+            <button class="gdpr-btn gdpr-accept" onclick="acceptCookies()">Accept All</button>
+        </div>
+    </div>
+
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal('about')"></div>
+            <h2>About TVILLING</h2>
+            <p>TVILLING pioneers the future of facility management through cutting-edge digital twin technology. Our platform seamlessly integrates real-time IoT data with immersive 3D visualization, creating a living digital replica of your physical spaces.</p>
+            <p>Founded on principles of innovation and data sovereignty, we deliver enterprise-grade solutions that are 100% GDPR compliant, ensuring your facility data remains secure and under your control.</p>
+            <p>Our mission is to transform how organizations interact with their built environments, enabling smarter decisions, predictive maintenance, and optimal resource utilization through the power of digital twins.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal('contact')"></div>
+            <h2>Get In Touch</h2>
+            <p>Ready to transform your facility management with cutting-edge digital twin technology? We'd love to hear from you.</p>
+            <p>Whether you're looking for a demo, have technical questions, or want to explore partnership opportunities, our team is here to help.</p>
+            <p style="margin-top: 2rem;">
+                <a href="mailto:anton.mikael.gronvall@outlook.com" class="contact-link">
+                    anton.mikael.gronvall@outlook.com
+                </a>
+            </p>
+            <p style="margin-top: 1rem; color: var(--text-secondary);">
+                Response time: Within 24 hours
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="demoModal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal('demo')"></div>
+            <h2>Request a Demo</h2>
+            <p>Experience the power of TVILLING's digital twin platform firsthand. Our personalized demo will show you how to:</p>
+            <ul style="color: var(--text-secondary); line-height: 2; margin: 1rem 0;">
+                <li>• Visualize your facility in real-time 3D</li>
+                <li>• Monitor IoT sensors and systems</li>
+                <li>• Analyze performance metrics</li>
+                <li>• Implement predictive maintenance</li>
+                <li>• Ensure GDPR compliance</li>
+            </ul>
+            <p>Contact us at: <a href="mailto:anton.mikael.gronvall@outlook.com" class="contact-link">anton.mikael.gronvall@outlook.com</a></p>
+        </div>
+    </div>
+
+    <div class="modal" id="privacyModal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeModal('privacy')"></div>
+            <h2>Privacy Settings</h2>
+            <p>We are committed to protecting your privacy and ensuring GDPR compliance. Here you can manage your data preferences:</p>
+            <div style="margin: 2rem 0;">
+                <label style="display: block; margin: 1rem 0;">
+                    <input type="checkbox" checked> Essential Cookies (Required)
+                </label>
+                <label style="display: block; margin: 1rem 0;">
+                    <input type="checkbox"> Analytics Cookies
+                </label>
+                <label style="display: block; margin: 1rem 0;">
+                    <input type="checkbox"> Marketing Cookies
+                </label>
+            </div>
+            <button class="btn-primary" style="width: 100%;" onclick="savePrivacySettings()">Save Settings</button>
+        </div>
+    </div>
+
+    <script>
+        // Three.js Globe Animation
+        let scene, camera, renderer, globe, particles;
+
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Create globe
+            const geometry = new THREE.IcosahedronGeometry(3, 1);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x0066ff,
+                wireframe: true,
+                opacity: 0.3,
+                transparent: true
+            });
+            globe = new THREE.Mesh(geometry, material);
+            scene.add(globe);
+
+            // Create particle system
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particleCount = 2000;
+            const positions = new Float32Array(particleCount * 3);
+
+            for(let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 20;
+                positions[i + 1] = (Math.random() - 0.5) * 20;
+                positions[i + 2] = (Math.random() - 0.5) * 20;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const particlesMaterial = new THREE.PointsMaterial({
+                color: 0x00d4ff,
+                size: 0.05,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+
+            camera.position.z = 8;
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (globe) {
+                globe.rotation.x += 0.001;
+                globe.rotation.y += 0.002;
+            }
+
+            if (particles) {
+                particles.rotation.x += 0.0002;
+                particles.rotation.y += 0.0001;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Initialize Three.js
+        initThree();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Counter animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+
+            counters.forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-target'));
+                const increment = target / 100;
+                let current = 0;
+
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target % 1 === 0 ? target : target.toFixed(1);
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.ceil(current);
+                    }
+                }, 20);
+            });
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.classList.contains('stat-card')) {
+                        animateCounters();
+                        observer.unobserve(entry.target);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe stat cards
+        document.querySelectorAll('.stat-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Chart.js initialization
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                }
+            };
+
+            // Energy Chart
+            const energyCtx = document.getElementById('energyChart');
+            if (energyCtx) {
+                new Chart(energyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 24}, (_, i) => i),
+                        datasets: [{
+                            data: Array.from({length: 24}, () => Math.random() * 100 + 750),
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
+
+            // Occupancy Chart
+            const occupancyCtx = document.getElementById('occupancyChart');
+            if (occupancyCtx) {
+                new Chart(occupancyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Array.from({length: 7}, (_, i) => i),
+                        datasets: [{
+                            data: Array.from({length: 7}, () => Math.random() * 30 + 60),
+                            backgroundColor: '#0066ff'
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
+
+            // Air Quality Chart
+            const airQualityCtx = document.getElementById('airQualityChart');
+            if (airQualityCtx) {
+                new Chart(airQualityCtx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [98, 2],
+                            backgroundColor: ['#00ff64', 'rgba(255,255,255,0.1)']
+                        }]
+                    },
+                    options: {
+                        ...chartOptions,
+                        cutout: '80%'
+                    }
+                });
+            }
+
+            // Temperature Chart
+            const temperatureCtx = document.getElementById('temperatureChart');
+            if (temperatureCtx) {
+                new Chart(temperatureCtx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 12}, (_, i) => i),
+                        datasets: [{
+                            data: Array.from({length: 12}, () => Math.random() * 2 + 21),
+                            borderColor: '#ff0066',
+                            backgroundColor: 'rgba(255, 0, 102, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
+        }
+
+        // Initialize charts when dashboard is visible
+        const dashboardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    initCharts();
+                    dashboardObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        const dashboard = document.getElementById('dashboard');
+        if (dashboard) {
+            dashboardObserver.observe(dashboard);
+        }
+
+        // GDPR Banner
+        setTimeout(() => {
+            const gdprBanner = document.getElementById('gdprBanner');
+            if (gdprBanner && !localStorage.getItem('gdprAccepted')) {
+                gdprBanner.classList.add('show');
+            }
+        }, 2000);
+
+        function acceptCookies() {
+            localStorage.setItem('gdprAccepted', 'true');
+            document.getElementById('gdprBanner').classList.remove('show');
+        }
+
+        function savePrivacySettings() {
+            localStorage.setItem('privacySettings', 'saved');
+            closeModal('privacy');
+            document.getElementById('gdprBanner').classList.remove('show');
+        }
+
+        // Modal functions
+        function openModal(type) {
+            const modal = document.getElementById(type + 'Modal');
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(type) {
+            const modal = document.getElementById(type + 'Modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        // Close modal on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+        });
+
+        // Close modal on background click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Hide loader when page is ready
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Add floating particles
+        function createParticles() {
+            const particleContainer = document.createElement('div');
+            particleContainer.style.position = 'fixed';
+            particleContainer.style.top = '0';
+            particleContainer.style.left = '0';
+            particleContainer.style.width = '100%';
+            particleContainer.style.height = '100%';
+            particleContainer.style.pointerEvents = 'none';
+            particleContainer.style.zIndex = '1';
+            document.body.appendChild(particleContainer);
+
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (Math.random() * 20 + 20) + 's';
+                particleContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        // GSAP Animations
+        if (typeof gsap !== 'undefined') {
+            gsap.from('.hero-badge', {
+                opacity: 0,
+                y: 20,
+                duration: 1,
+                delay: 0.5
+            });
+
+            gsap.from('.hero-title', {
+                opacity: 0,
+                y: 30,
+                duration: 1,
+                delay: 0.7
+            });
+
+            gsap.from('.hero-subtitle', {
+                opacity: 0,
+                y: 20,
+                duration: 1,
+                delay: 0.9
+            });
+
+            gsap.from('.hero-buttons', {
+                opacity: 0,
+                y: 20,
+                duration: 1,
+                delay: 1.1
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TVILLING - Digital Twins Simplified</title>
+    <meta name="description" content="Deploy enterprise-grade digital twins in minutes, not months. 10x lighter. 100% GDPR compliant. Zero complexity.">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .mobile-container {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .logo {
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 200;
+            line-height: 1.1;
+            text-align: center;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+        }
+
+        h1 strong {
+            font-weight: 600;
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0.7;
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .video-section {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .video-header {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .video-frame {
+            width: 100%;
+            height: 200px;
+            border: none;
+            display: block;
+        }
+
+        .use-cases-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .use-cases-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .use-case-item {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .use-case-item:active {
+            background: rgba(0, 255, 255, 0.05);
+            border-color: rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+        }
+
+        .contact-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .contact-label {
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .contact-email {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #00ffff;
+            cursor: pointer;
+            user-select: all;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .copy-button {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.8rem 2rem;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 6px;
+            color: #00ffff;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:active {
+            background: rgba(0, 255, 255, 0.2);
+            transform: scale(0.98);
+        }
+
+        .copy-button.success {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: rgba(0, 255, 0, 0.4);
+            color: #00ff00;
+        }
+
+        .desktop-link {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .desktop-link:active {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @media (min-width: 769px) {
+            /* Redirect to desktop if someone resizes */
+            body::before {
+                content: "Redirecting to desktop version...";
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 1.2rem;
+                animation: pulse 1.5s infinite;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="logo">TVILLING</div>
+
+        <header>
+            <h1>Digital Twins <strong>Simplified.</strong></h1>
+            <p class="subtitle">
+                Deploy enterprise-grade digital twins in minutes, not months.
+                10x lighter. 100% GDPR compliant. Zero complexity.
+            </p>
+        </header>
+
+        <div class="video-section">
+            <div class="video-header">DEMO VIDEO</div>
+            <iframe class="video-frame"
+                    src="https://www.youtube.com/embed/TnRcoMKz6tc"
+                    frameborder="0"
+                    allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="use-cases-section">
+            <div class="section-title">Use Cases</div>
+            <div class="use-cases-list">
+                <div class="use-case-item">Facility Management</div>
+                <div class="use-case-item">Smart Parking</div>
+                <div class="use-case-item">Alarm Systems</div>
+                <div class="use-case-item">Data Analytics</div>
+                <div class="use-case-item">GDPR Compliance</div>
+                <div class="use-case-item">Documentation</div>
+                <div class="use-case-item">Drawing Integration</div>
+                <div class="use-case-item">IoT Communication</div>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <div class="contact-label">Contact</div>
+            <div class="contact-email" id="email">anton.mikael.gronvall@outlook.com</div>
+            <button class="copy-button" onclick="copyEmail()">Copy Email</button>
+        </div>
+    </div>
+
+    <a href="index.html?desktop=true" class="desktop-link">View Desktop Version</a>
+
+    <script>
+        function copyEmail() {
+            const email = 'anton.mikael.gronvall@outlook.com';
+            navigator.clipboard.writeText(email).then(() => {
+                const button = document.querySelector('.copy-button');
+                button.textContent = 'Copied!';
+                button.classList.add('success');
+                setTimeout(() => {
+                    button.textContent = 'Copy Email';
+                    button.classList.remove('success');
+                }, 2000);
+            });
+        }
+
+        // Check if should be on desktop
+        if (window.innerWidth > 768 && !window.location.search.includes('mobile=true')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
