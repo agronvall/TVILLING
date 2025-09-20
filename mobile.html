@@ -92,125 +92,6 @@
             display: block;
         }
 
-        /* Floating orbital elements */
-        .floating-element {
-            position: fixed;
-            padding: 0.8rem 1.2rem;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            backdrop-filter: blur(15px);
-            font-size: 0.75rem;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.9);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 50;
-        }
-
-        .floating-element:hover {
-            background: rgba(0, 255, 255, 0.1);
-            border-color: rgba(0, 255, 255, 0.4);
-            transform: scale(1.05);
-        }
-
-        .floating-element.active {
-            background: rgba(0, 255, 255, 0.15);
-            border-color: #00ffff;
-            color: #00ffff;
-        }
-
-        /* Orbital positions */
-        .orbit-1 {
-            animation: orbit1 20s linear infinite;
-        }
-
-        .orbit-2 {
-            animation: orbit2 25s linear infinite;
-        }
-
-        .orbit-3 {
-            animation: orbit3 30s linear infinite;
-        }
-
-        .orbit-4 {
-            animation: orbit4 22s linear infinite;
-        }
-
-        .orbit-5 {
-            animation: orbit5 28s linear infinite;
-        }
-
-        .orbit-6 {
-            animation: orbit6 35s linear infinite;
-        }
-
-        .orbit-7 {
-            animation: orbit7 18s linear infinite;
-        }
-
-        .orbit-8 {
-            animation: orbit8 26s linear infinite;
-        }
-
-        @keyframes orbit1 {
-            0% { transform: translate(150px, -100px) scale(0.9); }
-            25% { transform: translate(100px, 150px) scale(1.1); }
-            50% { transform: translate(-150px, 100px) scale(0.95); }
-            75% { transform: translate(-100px, -150px) scale(1.05); }
-            100% { transform: translate(150px, -100px) scale(0.9); }
-        }
-
-        @keyframes orbit2 {
-            0% { transform: translate(-120px, -80px) scale(1); }
-            33% { transform: translate(140px, 50px) scale(0.9); }
-            66% { transform: translate(-100px, 120px) scale(1.1); }
-            100% { transform: translate(-120px, -80px) scale(1); }
-        }
-
-        @keyframes orbit3 {
-            0% { transform: translate(100px, 100px) scale(0.95); }
-            50% { transform: translate(-130px, -130px) scale(1.05); }
-            100% { transform: translate(100px, 100px) scale(0.95); }
-        }
-
-        @keyframes orbit4 {
-            0% { transform: translate(-140px, 60px) scale(1.05); }
-            25% { transform: translate(-60px, -140px) scale(0.95); }
-            50% { transform: translate(140px, -60px) scale(1); }
-            75% { transform: translate(60px, 140px) scale(1.1); }
-            100% { transform: translate(-140px, 60px) scale(1.05); }
-        }
-
-        @keyframes orbit5 {
-            0% { transform: translate(130px, -120px) scale(0.9); }
-            33% { transform: translate(-110px, 90px) scale(1.05); }
-            66% { transform: translate(80px, 130px) scale(1); }
-            100% { transform: translate(130px, -120px) scale(0.9); }
-        }
-
-        @keyframes orbit6 {
-            0% { transform: translate(-100px, -100px) scale(1); }
-            50% { transform: translate(120px, 120px) scale(0.95); }
-            100% { transform: translate(-100px, -100px) scale(1); }
-        }
-
-        @keyframes orbit7 {
-            0% { transform: translate(110px, 70px) scale(1.1); }
-            25% { transform: translate(-130px, 40px) scale(0.9); }
-            50% { transform: translate(-70px, -110px) scale(1); }
-            75% { transform: translate(90px, -90px) scale(1.05); }
-            100% { transform: translate(110px, 70px) scale(1.1); }
-        }
-
-        @keyframes orbit8 {
-            0% { transform: translate(-90px, 130px) scale(0.95); }
-            33% { transform: translate(150px, 0px) scale(1.05); }
-            66% { transform: translate(0px, -150px) scale(0.9); }
-            100% { transform: translate(-90px, 130px) scale(0.95); }
-        }
-
         .contact-float {
             position: fixed;
             bottom: 2rem;
@@ -319,23 +200,16 @@
         </div>
     </div>
 
-    <!-- Floating orbital use case elements -->
-    <div class="floating-element orbit-1">Facility Management</div>
-    <div class="floating-element orbit-2">Smart Parking</div>
-    <div class="floating-element orbit-3">Alarm Systems</div>
-    <div class="floating-element orbit-4">Data Analytics</div>
-    <div class="floating-element orbit-5">GDPR Compliance</div>
-    <div class="floating-element orbit-6">Documentation</div>
-    <div class="floating-element orbit-7">Drawing Integration</div>
-    <div class="floating-element orbit-8">IoT Communication</div>
-
     <div class="contact-float" onclick="copyEmail()">
         <span id="contactText">anton.mikael.gronvall@outlook.com</span>
     </div>
 
     <script>
-        // Three.js 3D Building (simplified for mobile)
+        // Three.js 3D Building with orbiting text
         let scene, camera, renderer, building, particles;
+        let textMeshes = [];
+        let raycaster, mouse;
+        let selectedObject = null;
 
         function initThree() {
             scene = new THREE.Scene();
@@ -345,6 +219,10 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setClearColor(0x000000, 0);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Raycaster for interaction
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
 
             // Create simplified building for mobile
             building = new THREE.Group();
@@ -383,6 +261,75 @@
 
             scene.add(building);
 
+            // Create orbiting text elements
+            const useCases = [
+                'Facility Management',
+                'Smart Parking',
+                'Alarm Systems',
+                'Data Analytics',
+                'GDPR Compliance',
+                'Documentation',
+                'Drawing Integration',
+                'IoT Communication'
+            ];
+
+            // Create text sprites that orbit around the building
+            useCases.forEach((text, index) => {
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = 256;
+                canvas.height = 64;
+
+                // Draw text on canvas
+                context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+
+                context.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                context.lineWidth = 2;
+                context.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
+
+                context.font = '18px Inter';
+                context.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+                // Create sprite from canvas
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMaterial = new THREE.SpriteMaterial({
+                    map: texture,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                sprite.scale.set(4, 1, 1);
+
+                // Set initial position in a circle around the building
+                const angle = (index / useCases.length) * Math.PI * 2;
+                const radius = 12;
+                const height = (index - 3.5) * 1.5;
+
+                sprite.position.set(
+                    Math.cos(angle) * radius,
+                    height,
+                    Math.sin(angle) * radius
+                );
+
+                sprite.userData = {
+                    text: text,
+                    angle: angle,
+                    radius: radius + (Math.random() - 0.5) * 2,
+                    height: height,
+                    speed: 0.001 + Math.random() * 0.001,
+                    verticalSpeed: 0.0005 * (Math.random() - 0.5),
+                    index: index,
+                    originalOpacity: 0.9
+                };
+
+                scene.add(sprite);
+                textMeshes.push(sprite);
+            });
+
             // Add floating particles
             const particlesGeometry = new THREE.BufferGeometry();
             const particleCount = 100;
@@ -413,7 +360,7 @@
             particles = new THREE.Points(particlesGeometry, particlesMaterial);
             scene.add(particles);
 
-            camera.position.set(0, 0, 20);
+            camera.position.set(0, 0, 25);
             camera.lookAt(0, 0, 0);
 
             animate();
@@ -422,15 +369,46 @@
         function animate() {
             requestAnimationFrame(animate);
 
+            // Rotate building
             if (building) {
                 building.rotation.y += 0.002;
                 building.rotation.x = Math.sin(Date.now() * 0.0001) * 0.05;
             }
 
+            // Animate particles
             if (particles) {
                 particles.rotation.y += 0.0005;
                 particles.rotation.x += 0.0002;
             }
+
+            // Orbit text around building
+            textMeshes.forEach((sprite, index) => {
+                const userData = sprite.userData;
+                userData.angle += userData.speed;
+
+                // Update position
+                sprite.position.x = Math.cos(userData.angle) * userData.radius;
+                sprite.position.z = Math.sin(userData.angle) * userData.radius;
+
+                // Gentle vertical movement
+                sprite.position.y = userData.height + Math.sin(Date.now() * 0.001 + index) * 0.5;
+
+                // Make sprite always face camera
+                sprite.lookAt(camera.position);
+
+                // Fade based on distance from camera
+                const distance = sprite.position.distanceTo(camera.position);
+                sprite.material.opacity = userData.originalOpacity * (1 - (distance - 20) / 20);
+                sprite.material.opacity = Math.max(0.3, Math.min(userData.originalOpacity, sprite.material.opacity));
+
+                // Pulse selected item
+                if (selectedObject === sprite) {
+                    sprite.material.opacity = 0.95 + Math.sin(Date.now() * 0.01) * 0.05;
+                    sprite.material.color = new THREE.Color(0x00ffff);
+                } else {
+                    sprite.material.color = new THREE.Color(0xffffff);
+                }
+            });
 
             renderer.render(scene, camera);
         }
@@ -446,6 +424,30 @@
             }
         });
 
+        // Handle touch/click on 3D text
+        function onTouch(event) {
+            event.preventDefault();
+
+            const touch = event.touches ? event.touches[0] : event;
+            mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(textMeshes);
+
+            if (intersects.length > 0) {
+                selectedObject = intersects[0].object;
+
+                // Visual feedback
+                setTimeout(() => {
+                    selectedObject = null;
+                }, 1000);
+            }
+        }
+
+        window.addEventListener('touchstart', onTouch, false);
+        window.addEventListener('click', onTouch, false);
+
         // Copy email function
         function copyEmail() {
             const email = 'anton.mikael.gronvall@outlook.com';
@@ -460,16 +462,6 @@
                 }, 2000);
             });
         }
-
-        // Add click interaction for floating elements
-        document.querySelectorAll('.floating-element').forEach(el => {
-            el.addEventListener('click', function() {
-                this.classList.toggle('active');
-                setTimeout(() => {
-                    this.classList.remove('active');
-                }, 1000);
-            });
-        });
 
         // Touch optimization
         document.addEventListener('touchmove', function(e) {
