@@ -84,6 +84,110 @@
             transform: scale(1) translateY(0);
         }
 
+        .contact-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 90%;
+            max-width: 350px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.3);
+        }
+
+        .contact-modal.active {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .contact-modal h3 {
+            color: #00ffff;
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            letter-spacing: 0.1em;
+        }
+
+        .email-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #fff;
+            user-select: all;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .email-display:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.4);
+        }
+
+        .copy-email-btn {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.5);
+            border-radius: 8px;
+            color: #00ffff;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .copy-email-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: #00ffff;
+            transform: translateY(-2px);
+        }
+
+        .copy-email-btn.success {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: rgba(0, 255, 0, 0.5);
+            color: #00ff00;
+        }
+
+        .close-contact-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.2rem;
+        }
+
+        .close-contact-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
         .video-header {
             padding: 0.8rem;
             background: rgba(255, 255, 255, 0.08);
@@ -288,7 +392,7 @@
     </div>
 
     <div class="bottom-buttons">
-        <button class="contact-float" onclick="copyEmail()">
+        <button class="contact-float" onclick="showContact()">
             <span>📧</span>
             <span id="contactText">Contact</span>
         </button>
@@ -297,6 +401,14 @@
             <span>▶</span>
             <span>Demo Video</span>
         </button>
+    </div>
+
+    <div class="contact-modal" id="contactModal">
+        <button class="close-contact-btn" onclick="hideContact()">×</button>
+        <h3>CONTACT</h3>
+        <div class="email-display" onclick="copyEmailFromModal()">anton.mikael.gronvall@outlook.com</div>
+        <button class="copy-email-btn" id="copyBtn" onclick="copyEmailFromModal()">📋 Copy Email</button>
+        <p style="text-align: center; color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 1rem;">Click email or button to copy</p>
     </div>
 
     <script>
@@ -372,35 +484,41 @@
             useCases.forEach((text, index) => {
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
-                canvas.width = 512;
-                canvas.height = 128;
+                // Ultra high resolution for mobile
+                const scale = 4; // 4x resolution for retina displays
+                canvas.width = 512 * scale;
+                canvas.height = 128 * scale;
 
-                // Enable crisp text rendering
-                context.imageSmoothingEnabled = false;
+                // Scale context for high DPI
+                context.scale(scale, scale);
 
                 // Draw text on canvas with higher DPI
-                context.fillStyle = 'rgba(0, 0, 0, 0.85)';
-                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.fillStyle = 'rgba(0, 0, 0, 0.9)';
+                context.fillRect(0, 0, 512, 128);
 
-                context.strokeStyle = 'rgba(0, 255, 255, 0.4)';
-                context.lineWidth = 3;
-                context.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
+                context.strokeStyle = 'rgba(0, 255, 255, 0.6)';
+                context.lineWidth = 2;
+                context.strokeRect(2, 2, 508, 124);
 
-                context.font = 'bold 32px Inter';
-                context.fillStyle = 'rgba(255, 255, 255, 1)';
+                context.font = 'bold 36px Inter';
+                context.fillStyle = '#ffffff';
+                context.shadowColor = 'rgba(0, 255, 255, 0.5)';
+                context.shadowBlur = 3;
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
-                context.fillText(text, canvas.width / 2, canvas.height / 2);
+                context.fillText(text, 256, 64);
 
                 // Create sprite from canvas
                 const texture = new THREE.CanvasTexture(canvas);
+                texture.minFilter = THREE.LinearFilter;
+                texture.magFilter = THREE.LinearFilter;
                 const spriteMaterial = new THREE.SpriteMaterial({
                     map: texture,
                     transparent: true,
-                    opacity: 0.9
+                    opacity: 0.95
                 });
                 const sprite = new THREE.Sprite(spriteMaterial);
-                sprite.scale.set(4, 1, 1);
+                sprite.scale.set(5, 1.25, 1);
 
                 // Set initial position in a circle around the building
                 const angle = (index / useCases.length) * Math.PI * 2;
@@ -575,17 +693,32 @@
             playBtn.classList.remove('hidden');
         }
 
-        // Copy email function
-        function copyEmail() {
+        // Contact modal functions
+        function showContact() {
+            const modal = document.getElementById('contactModal');
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+        }
+
+        function hideContact() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function copyEmailFromModal() {
             const email = 'anton.mikael.gronvall@outlook.com';
             navigator.clipboard.writeText(email).then(() => {
-                const contactFloat = document.querySelector('.contact-float');
-                const contactText = document.getElementById('contactText');
-                contactFloat.classList.add('copied');
-                contactText.innerHTML = '✓ Copied!';
+                const copyBtn = document.getElementById('copyBtn');
+                copyBtn.classList.add('success');
+                copyBtn.innerHTML = '✅ Copied!';
                 setTimeout(() => {
-                    contactFloat.classList.remove('copied');
-                    contactText.innerHTML = 'Contact';
+                    copyBtn.classList.remove('success');
+                    copyBtn.innerHTML = '📋 Copy Email';
                 }, 2000);
             });
         }
