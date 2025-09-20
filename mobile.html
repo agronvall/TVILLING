@@ -456,6 +456,16 @@
             const wireframeBuilding = new THREE.LineSegments(buildingEdges, buildingMaterial);
             building.add(wireframeBuilding);
 
+            // Add invisible building geometry for proper depth occlusion
+            const solidBuildingMaterial = new THREE.MeshBasicMaterial({
+                transparent: true,
+                opacity: 0,
+                depthWrite: true,
+                depthTest: true
+            });
+            const solidBuilding = new THREE.Mesh(buildingGeometry, solidBuildingMaterial);
+            building.add(solidBuilding);
+
             // Add some glowing windows
             for (let floor = 0; floor < 5; floor++) {
                 for (let window = 0; window < 3; window++) {
@@ -527,8 +537,8 @@
                     transparent: true,
                     opacity: 0.95,
                     alphaTest: 0.1, // Prevent transparent edge artifacts
-                    depthTest: false, // Prevent depth buffer conflicts
-                    depthWrite: false, // Disable depth writing
+                    depthTest: true, // Enable depth testing for proper behind/front visibility
+                    depthWrite: true, // Enable depth writing for proper occlusion
                     blending: THREE.NormalBlending // Use stable blending mode
                 });
                 const sprite = new THREE.Sprite(spriteMaterial);
@@ -639,10 +649,20 @@
                 const direction = new THREE.Vector3().subVectors(camera.position, sprite.position).normalize();
                 sprite.lookAt(sprite.position.clone().add(direction));
 
-                // Ultra-stable opacity system
-                const distanceFromCamera = sprite.position.distanceTo(camera.position);
-                const normalizedDistance = Math.min(distanceFromCamera / 40, 1);
-                const stabilizedOpacity = 0.85 + (1 - normalizedDistance) * 0.15;
+                // Check if sprite is behind the building for proper visibility
+                const spriteDistance = sprite.position.distanceTo(camera.position);
+                const buildingDistance = building.position.distanceTo(camera.position);
+                const isBehindBuilding = sprite.position.z < 0 && Math.abs(sprite.position.x) < 6 && Math.abs(sprite.position.y) < 8;
+
+                // Calculate visibility based on position relative to building
+                let targetOpacity = 0.95;
+                if (isBehindBuilding) {
+                    targetOpacity = 0.1; // Much dimmer when behind building
+                } else if (sprite.position.z < 5) {
+                    // Fade when getting close to building front
+                    const fadeDistance = Math.abs(sprite.position.z);
+                    targetOpacity = 0.3 + (fadeDistance / 5) * 0.65;
+                }
 
                 // Smooth state transitions
                 if (selectedObject === sprite) {
@@ -650,19 +670,13 @@
                     const targetColor = new THREE.Color(0x00ffff);
                     sprite.material.color.lerp(targetColor, 0.05);
                 } else {
-                    sprite.material.opacity += (stabilizedOpacity - sprite.material.opacity) * 0.05;
+                    sprite.material.opacity += (targetOpacity - sprite.material.opacity) * 0.05;
                     const targetColor = new THREE.Color(0xffffff);
                     sprite.material.color.lerp(targetColor, 0.05);
                 }
 
-                // Advanced anti-flicker rendering settings
-                sprite.material.depthTest = false;
-                sprite.material.depthWrite = false;
-                sprite.material.alphaTest = 0.1;
-                sprite.renderOrder = 1000 + index;
-
-                // Force material update to prevent edge flickering
-                sprite.material.needsUpdate = false;
+                // Proper depth-based rendering
+                sprite.renderOrder = Math.floor(spriteDistance * 10); // Dynamic render order based on distance
             });
 
             renderer.render(scene, camera);
