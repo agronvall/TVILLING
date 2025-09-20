@@ -6,6 +6,8 @@
     <title>TVILLING - Digital Twins Simplified</title>
     <meta name="description" content="Deploy enterprise-grade digital twins in minutes, not months. 10x lighter. 100% GDPR compliant. Zero complexity.">
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap');
 
@@ -19,66 +21,65 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #000;
             color: #fff;
-            min-height: 100vh;
-            padding: 2rem 1.5rem;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
         }
 
-        .mobile-container {
-            max-width: 100%;
-            margin: 0 auto;
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .content-layer > * {
+            pointer-events: auto;
         }
 
         .logo {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 1rem;
             font-weight: 500;
             letter-spacing: 2px;
-            opacity: 0.7;
-            text-align: center;
-            margin-bottom: 1rem;
+            opacity: 0.8;
+            z-index: 100;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 200;
-            line-height: 1.1;
-            text-align: center;
-            letter-spacing: -1px;
-            margin-bottom: 1rem;
-        }
-
-        h1 strong {
-            font-weight: 600;
-            display: block;
-            margin-top: 0.5rem;
-        }
-
-        .subtitle {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            opacity: 0.7;
-            font-weight: 300;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .video-section {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.02);
+        .video-container {
+            width: 90%;
+            max-width: 400px;
+            background: rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
+            backdrop-filter: blur(20px);
             overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.2);
             margin-bottom: 2rem;
         }
 
         .video-header {
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.03);
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             letter-spacing: 0.2em;
             font-weight: 400;
             color: rgba(255, 255, 255, 0.7);
@@ -91,152 +92,224 @@
             display: block;
         }
 
-        .use-cases-section {
-            margin-bottom: 2rem;
-        }
-
-        .section-title {
-            font-size: 0.8rem;
-            letter-spacing: 0.2em;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        .use-cases-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-
-        .use-case-item {
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        /* Floating orbital elements */
+        .floating-element {
+            position: fixed;
+            padding: 0.8rem 1.2rem;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
-            font-size: 0.9rem;
+            backdrop-filter: blur(15px);
+            font-size: 0.75rem;
             font-weight: 300;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.9);
             text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .use-case-item:active {
-            background: rgba(0, 255, 255, 0.05);
-            border-color: rgba(0, 255, 255, 0.2);
-            color: #00ffff;
-        }
-
-        .contact-section {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .contact-label {
-            font-size: 0.8rem;
-            letter-spacing: 0.2em;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-        }
-
-        .contact-email {
-            font-size: 1rem;
-            font-weight: 400;
-            color: #00ffff;
             cursor: pointer;
-            user-select: all;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            border: 1px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            z-index: 50;
         }
 
-        .copy-button {
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 0.8rem 2rem;
+        .floating-element:hover {
             background: rgba(0, 255, 255, 0.1);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 6px;
+            border-color: rgba(0, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        .floating-element.active {
+            background: rgba(0, 255, 255, 0.15);
+            border-color: #00ffff;
             color: #00ffff;
+        }
+
+        /* Orbital positions */
+        .orbit-1 {
+            animation: orbit1 20s linear infinite;
+        }
+
+        .orbit-2 {
+            animation: orbit2 25s linear infinite;
+        }
+
+        .orbit-3 {
+            animation: orbit3 30s linear infinite;
+        }
+
+        .orbit-4 {
+            animation: orbit4 22s linear infinite;
+        }
+
+        .orbit-5 {
+            animation: orbit5 28s linear infinite;
+        }
+
+        .orbit-6 {
+            animation: orbit6 35s linear infinite;
+        }
+
+        .orbit-7 {
+            animation: orbit7 18s linear infinite;
+        }
+
+        .orbit-8 {
+            animation: orbit8 26s linear infinite;
+        }
+
+        @keyframes orbit1 {
+            0% { transform: translate(150px, -100px) scale(0.9); }
+            25% { transform: translate(100px, 150px) scale(1.1); }
+            50% { transform: translate(-150px, 100px) scale(0.95); }
+            75% { transform: translate(-100px, -150px) scale(1.05); }
+            100% { transform: translate(150px, -100px) scale(0.9); }
+        }
+
+        @keyframes orbit2 {
+            0% { transform: translate(-120px, -80px) scale(1); }
+            33% { transform: translate(140px, 50px) scale(0.9); }
+            66% { transform: translate(-100px, 120px) scale(1.1); }
+            100% { transform: translate(-120px, -80px) scale(1); }
+        }
+
+        @keyframes orbit3 {
+            0% { transform: translate(100px, 100px) scale(0.95); }
+            50% { transform: translate(-130px, -130px) scale(1.05); }
+            100% { transform: translate(100px, 100px) scale(0.95); }
+        }
+
+        @keyframes orbit4 {
+            0% { transform: translate(-140px, 60px) scale(1.05); }
+            25% { transform: translate(-60px, -140px) scale(0.95); }
+            50% { transform: translate(140px, -60px) scale(1); }
+            75% { transform: translate(60px, 140px) scale(1.1); }
+            100% { transform: translate(-140px, 60px) scale(1.05); }
+        }
+
+        @keyframes orbit5 {
+            0% { transform: translate(130px, -120px) scale(0.9); }
+            33% { transform: translate(-110px, 90px) scale(1.05); }
+            66% { transform: translate(80px, 130px) scale(1); }
+            100% { transform: translate(130px, -120px) scale(0.9); }
+        }
+
+        @keyframes orbit6 {
+            0% { transform: translate(-100px, -100px) scale(1); }
+            50% { transform: translate(120px, 120px) scale(0.95); }
+            100% { transform: translate(-100px, -100px) scale(1); }
+        }
+
+        @keyframes orbit7 {
+            0% { transform: translate(110px, 70px) scale(1.1); }
+            25% { transform: translate(-130px, 40px) scale(0.9); }
+            50% { transform: translate(-70px, -110px) scale(1); }
+            75% { transform: translate(90px, -90px) scale(1.05); }
+            100% { transform: translate(110px, 70px) scale(1.1); }
+        }
+
+        @keyframes orbit8 {
+            0% { transform: translate(-90px, 130px) scale(0.95); }
+            33% { transform: translate(150px, 0px) scale(1.05); }
+            66% { transform: translate(0px, -150px) scale(0.9); }
+            100% { transform: translate(-90px, 130px) scale(0.95); }
+        }
+
+        .contact-float {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
             font-size: 0.85rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
+            color: #00ffff;
             cursor: pointer;
             transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
         }
 
-        .copy-button:active {
-            background: rgba(0, 255, 255, 0.2);
-            transform: scale(0.98);
+        .contact-float:hover {
+            background: rgba(0, 255, 255, 0.1);
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
         }
 
-        .copy-button.success {
-            background: rgba(0, 255, 0, 0.2);
+        .contact-float.copied {
+            background: rgba(0, 255, 0, 0.1);
             border-color: rgba(0, 255, 0, 0.4);
             color: #00ff00;
         }
 
+        h1 {
+            position: fixed;
+            top: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.8rem;
+            font-weight: 200;
+            letter-spacing: -1px;
+            text-align: center;
+            opacity: 0.9;
+            z-index: 90;
+            pointer-events: none;
+        }
+
+        h1 strong {
+            display: block;
+            font-weight: 600;
+            margin-top: 0.3rem;
+        }
+
         .desktop-link {
             position: fixed;
-            bottom: 1rem;
+            top: 1.5rem;
             right: 1rem;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 6px;
             color: rgba(255, 255, 255, 0.5);
             text-decoration: none;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             transition: all 0.3s ease;
+            z-index: 100;
         }
 
-        .desktop-link:active {
+        .desktop-link:hover {
             background: rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.8);
         }
 
-        @media (min-width: 769px) {
-            /* Redirect to desktop if someone resizes */
-            body::before {
-                content: "Redirecting to desktop version...";
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 1.2rem;
-                animation: pulse 1.5s infinite;
+        /* Responsive adjustments */
+        @media (max-height: 700px) {
+            .video-frame {
+                height: 150px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                top: 3.5rem;
             }
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        @media (min-width: 769px) {
+            /* Redirect to desktop if someone resizes */
+            window.location.href = 'index.html';
         }
     </style>
 </head>
 <body>
-    <div class="mobile-container">
-        <div class="logo">TVILLING</div>
+    <div id="canvas-container"></div>
 
-        <header>
-            <h1>Digital Twins <strong>Simplified.</strong></h1>
-            <p class="subtitle">
-                Deploy enterprise-grade digital twins in minutes, not months.
-                10x lighter. 100% GDPR compliant. Zero complexity.
-            </p>
-        </header>
+    <div class="logo">TVILLING</div>
 
-        <div class="video-section">
+    <h1>Digital Twins <strong>Simplified.</strong></h1>
+
+    <a href="index.html?desktop=true" class="desktop-link">Desktop</a>
+
+    <div class="content-layer">
+        <div class="video-container">
             <div class="video-header">DEMO VIDEO</div>
             <iframe class="video-frame"
                     src="https://www.youtube.com/embed/TnRcoMKz6tc"
@@ -244,48 +317,165 @@
                     allowfullscreen>
             </iframe>
         </div>
-
-        <div class="use-cases-section">
-            <div class="section-title">Use Cases</div>
-            <div class="use-cases-list">
-                <div class="use-case-item">Facility Management</div>
-                <div class="use-case-item">Smart Parking</div>
-                <div class="use-case-item">Alarm Systems</div>
-                <div class="use-case-item">Data Analytics</div>
-                <div class="use-case-item">GDPR Compliance</div>
-                <div class="use-case-item">Documentation</div>
-                <div class="use-case-item">Drawing Integration</div>
-                <div class="use-case-item">IoT Communication</div>
-            </div>
-        </div>
-
-        <div class="contact-section">
-            <div class="contact-label">Contact</div>
-            <div class="contact-email" id="email">anton.mikael.gronvall@outlook.com</div>
-            <button class="copy-button" onclick="copyEmail()">Copy Email</button>
-        </div>
     </div>
 
-    <a href="index.html?desktop=true" class="desktop-link">View Desktop Version</a>
+    <!-- Floating orbital use case elements -->
+    <div class="floating-element orbit-1">Facility Management</div>
+    <div class="floating-element orbit-2">Smart Parking</div>
+    <div class="floating-element orbit-3">Alarm Systems</div>
+    <div class="floating-element orbit-4">Data Analytics</div>
+    <div class="floating-element orbit-5">GDPR Compliance</div>
+    <div class="floating-element orbit-6">Documentation</div>
+    <div class="floating-element orbit-7">Drawing Integration</div>
+    <div class="floating-element orbit-8">IoT Communication</div>
+
+    <div class="contact-float" onclick="copyEmail()">
+        <span id="contactText">anton.mikael.gronvall@outlook.com</span>
+    </div>
 
     <script>
+        // Three.js 3D Building (simplified for mobile)
+        let scene, camera, renderer, building, particles;
+
+        function initThree() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Create simplified building for mobile
+            building = new THREE.Group();
+
+            // Main building wireframe
+            const buildingGeometry = new THREE.BoxGeometry(8, 12, 6);
+            const buildingEdges = new THREE.EdgesGeometry(buildingGeometry);
+            const buildingMaterial = new THREE.LineBasicMaterial({
+                color: 0xffffff,
+                linewidth: 1,
+                transparent: true,
+                opacity: 0.3
+            });
+            const wireframeBuilding = new THREE.LineSegments(buildingEdges, buildingMaterial);
+            building.add(wireframeBuilding);
+
+            // Add some glowing windows
+            for (let floor = 0; floor < 5; floor++) {
+                for (let window = 0; window < 3; window++) {
+                    const windowGeometry = new THREE.PlaneGeometry(1, 1.2);
+                    const windowMaterial = new THREE.MeshBasicMaterial({
+                        color: 0x00ffff,
+                        transparent: true,
+                        opacity: 0.1 + Math.random() * 0.15,
+                        side: THREE.DoubleSide
+                    });
+                    const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial);
+                    windowMesh.position.set(
+                        (window - 1) * 2,
+                        -4 + floor * 2,
+                        3.01
+                    );
+                    building.add(windowMesh);
+                }
+            }
+
+            scene.add(building);
+
+            // Add floating particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particleCount = 100;
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            for(let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 30;
+                positions[i + 1] = (Math.random() - 0.5) * 30;
+                positions[i + 2] = (Math.random() - 0.5) * 30;
+
+                colors[i] = 0;
+                colors[i + 1] = Math.random() * 0.5 + 0.5;
+                colors[i + 2] = Math.random() * 0.5 + 0.5;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.5,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+
+            camera.position.set(0, 0, 20);
+            camera.lookAt(0, 0, 0);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (building) {
+                building.rotation.y += 0.002;
+                building.rotation.x = Math.sin(Date.now() * 0.0001) * 0.05;
+            }
+
+            if (particles) {
+                particles.rotation.y += 0.0005;
+                particles.rotation.x += 0.0002;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        initThree();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+
+        // Copy email function
         function copyEmail() {
             const email = 'anton.mikael.gronvall@outlook.com';
             navigator.clipboard.writeText(email).then(() => {
-                const button = document.querySelector('.copy-button');
-                button.textContent = 'Copied!';
-                button.classList.add('success');
+                const contactFloat = document.querySelector('.contact-float');
+                const contactText = document.getElementById('contactText');
+                contactFloat.classList.add('copied');
+                contactText.textContent = 'Copied!';
                 setTimeout(() => {
-                    button.textContent = 'Copy Email';
-                    button.classList.remove('success');
+                    contactFloat.classList.remove('copied');
+                    contactText.textContent = email;
                 }, 2000);
             });
         }
 
-        // Check if should be on desktop
-        if (window.innerWidth > 768 && !window.location.search.includes('mobile=true')) {
-            window.location.href = 'index.html';
-        }
+        // Add click interaction for floating elements
+        document.querySelectorAll('.floating-element').forEach(el => {
+            el.addEventListener('click', function() {
+                this.classList.toggle('active');
+                setTimeout(() => {
+                    this.classList.remove('active');
+                }, 1000);
+            });
+        });
+
+        // Touch optimization
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.content-layer')) return;
+            e.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 </html>
